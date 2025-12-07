@@ -1,0 +1,147 @@
+cmake_minimum_required(VERSION 3.16)
+project(OrderMatchingEngine VERSION 1.0.0 LANGUAGES CXX)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C++ Standard
+# ─────────────────────────────────────────────────────────────────────────────
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Compiler Flags
+# ─────────────────────────────────────────────────────────────────────────────
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+        -Wconversion
+        -Wshadow
+        -Wno-unused-parameter
+    )
+    
+    # Release optimizations
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -flto")
+    
+    # Debug flags
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -fsanitize=address,undefined")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fsanitize=address,undefined")
+endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Include Directories
+# ─────────────────────────────────────────────────────────────────────────────
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Core Library
+# ─────────────────────────────────────────────────────────────────────────────
+set(LIB_SOURCES
+    src/order_pool.cpp
+    src/price_level.cpp
+    src/order_book.cpp
+)
+
+add_library(order_matching_engine STATIC ${LIB_SOURCES})
+target_include_directories(order_matching_engine PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main Executable
+# ─────────────────────────────────────────────────────────────────────────────
+add_executable(order_matching src/main.cpp)
+target_link_libraries(order_matching PRIVATE order_matching_engine)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Testing (Google Test)
+# ─────────────────────────────────────────────────────────────────────────────
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+    include(FetchContent)
+    
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.14.0
+    )
+    FetchContent_MakeAvailable(googletest)
+    
+    enable_testing()
+    
+    add_executable(order_book_test tests/order_book_test.cpp)
+    target_link_libraries(order_book_test
+        PRIVATE
+            order_matching_engine
+            GTest::gtest_main
+    )
+    
+    add_executable(invariants_test tests/invariants_test.cpp)
+    target_link_libraries(invariants_test
+        PRIVATE
+            order_matching_engine
+            GTest::gtest_main
+    )
+    
+    include(GoogleTest)
+    gtest_discover_tests(order_book_test)
+    gtest_discover_tests(invariants_test)
+endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Benchmarking (Google Benchmark)
+# ─────────────────────────────────────────────────────────────────────────────
+option(BUILD_BENCHMARKS "Build benchmarks" ON)
+
+if(BUILD_BENCHMARKS)
+    include(FetchContent)
+    
+    FetchContent_Declare(
+        benchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.8.3
+    )
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(benchmark)
+    
+    add_executable(order_book_bench benchmarks/order_book_bench.cpp)
+    target_link_libraries(order_book_bench
+        PRIVATE
+            order_matching_engine
+            benchmark::benchmark
+            benchmark::benchmark_main
+    )
+    
+    # Ensure benchmarks are built with release optimizations
+    target_compile_options(order_book_bench PRIVATE -O3 -march=native)
+endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Installation
+# ─────────────────────────────────────────────────────────────────────────────
+install(TARGETS order_matching order_matching_engine
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+install(DIRECTORY include/ DESTINATION include)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Summary
+# ─────────────────────────────────────────────────────────────────────────────
+message(STATUS "")
+message(STATUS "╔═══════════════════════════════════════════════════════════════╗")
+message(STATUS "║             Order Matching Engine - Build Config              ║")
+message(STATUS "╠═══════════════════════════════════════════════════════════════╣")
+message(STATUS "║  Build Type:      ${CMAKE_BUILD_TYPE}")
+message(STATUS "║  C++ Standard:    C++${CMAKE_CXX_STANDARD}")
+message(STATUS "║  Compiler:        ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "║  Tests:           ${BUILD_TESTS}")
+message(STATUS "║  Benchmarks:      ${BUILD_BENCHMARKS}")
+message(STATUS "╚═══════════════════════════════════════════════════════════════╝")
+message(STATUS "")
+
