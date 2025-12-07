@@ -41,18 +41,18 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # ─────────────────────────────────────────────────────────────────────────────
 set(LIB_SOURCES
     src/order_pool.cpp
-    src/price_level.cpp
-    src/order_book.cpp
+    # src/price_level.cpp   # TODO: uncomment when implemented
+    # src/order_book.cpp    # TODO: uncomment when implemented
 )
 
 add_library(order_matching_engine STATIC ${LIB_SOURCES})
 target_include_directories(order_matching_engine PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Main Executable
+# Main Executable (disabled until order_book is implemented)
 # ─────────────────────────────────────────────────────────────────────────────
-add_executable(order_matching src/main.cpp)
-target_link_libraries(order_matching PRIVATE order_matching_engine)
+# add_executable(order_matching src/main.cpp)
+# target_link_libraries(order_matching PRIVATE order_matching_engine)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Testing (Google Test)
@@ -71,29 +71,31 @@ if(BUILD_TESTS)
     
     enable_testing()
     
-    add_executable(order_book_test tests/order_book_test.cpp)
-    target_link_libraries(order_book_test
-        PRIVATE
-            order_matching_engine
-            GTest::gtest_main
-    )
-    
-    add_executable(invariants_test tests/invariants_test.cpp)
-    target_link_libraries(invariants_test
+    # OrderPool tests
+    add_executable(order_pool_test tests/order_pool_test.cpp)
+    target_link_libraries(order_pool_test
         PRIVATE
             order_matching_engine
             GTest::gtest_main
     )
     
     include(GoogleTest)
-    gtest_discover_tests(order_book_test)
-    gtest_discover_tests(invariants_test)
+    gtest_discover_tests(order_pool_test)
+    
+    # TODO: uncomment when implemented
+    # add_executable(order_book_test tests/order_book_test.cpp)
+    # target_link_libraries(order_book_test PRIVATE order_matching_engine GTest::gtest_main)
+    # gtest_discover_tests(order_book_test)
+    
+    # add_executable(invariants_test tests/invariants_test.cpp)
+    # target_link_libraries(invariants_test PRIVATE order_matching_engine GTest::gtest_main)
+    # gtest_discover_tests(invariants_test)
 endif()
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Benchmarking (Google Benchmark)
+# Benchmarking (Google Benchmark) - disabled until order_book is implemented
 # ─────────────────────────────────────────────────────────────────────────────
-option(BUILD_BENCHMARKS "Build benchmarks" ON)
+option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 
 if(BUILD_BENCHMARKS)
     include(FetchContent)
@@ -115,20 +117,8 @@ if(BUILD_BENCHMARKS)
             benchmark::benchmark_main
     )
     
-    # Ensure benchmarks are built with release optimizations
     target_compile_options(order_book_bench PRIVATE -O3 -march=native)
 endif()
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Installation
-# ─────────────────────────────────────────────────────────────────────────────
-install(TARGETS order_matching order_matching_engine
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-install(DIRECTORY include/ DESTINATION include)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Summary
@@ -144,4 +134,3 @@ message(STATUS "║  Tests:           ${BUILD_TESTS}")
 message(STATUS "║  Benchmarks:      ${BUILD_BENCHMARKS}")
 message(STATUS "╚═══════════════════════════════════════════════════════════════╝")
 message(STATUS "")
-

@@ -11,8 +11,8 @@ public:
     Order* allocate();
     void deallocate(Order* order);
 
-    std::size_t capacity() const noexcept;
-    std::size_t freeCount() const noexcept;
+    std::size_t capacity() const noexcept { return capacity_;};
+    std::size_t freeCount() const noexcept { return freeCount_; };
 
 private:
     std::size_t capacity_;
