@@ -173,3 +173,14 @@ TEST(OrderPoolDeathTest, DeallocateWhenFullAsserts) {
 
     EXPECT_DEATH(pool.deallocate(o), "");
 }
+
+TEST(OrderPoolDeathTest, DoubleDeallocateAsserts) {
+    OrderPool pool(3);
+
+    Order* o1 = pool.allocate();
+    (void)pool.allocate(); 
+
+    pool.deallocate(o1);
+
+    EXPECT_DEATH(pool.deallocate(o1), "");
+}

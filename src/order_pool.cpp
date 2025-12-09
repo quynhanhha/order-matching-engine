@@ -6,14 +6,14 @@ OrderPool::OrderPool(std::size_t capacity)
     : capacity_(capacity),
     orders_(std::make_unique<Order[]>(capacity)),
     freeList_(nullptr),
-    freeCount_(capacity)
+    freeCount_(capacity),
+    isAllocated_(capacity, 0)
 {
     freeList_ = nullptr;
     for (std::size_t i = 0; i < capacity_; ++i) {
         orders_[i].next = freeList_;
         freeList_ = &orders_[i];
     }
-    freeCount_ = capacity_;
 }
 
 Order* OrderPool::allocate() {
@@ -28,12 +28,23 @@ Order* OrderPool::allocate() {
     order->next = nullptr;
     order->prev = nullptr;
 
+    std::ptrdiff_t idx = order - &orders_[0];
+    assert(idx >= 0);
+    assert(static_cast<std::size_t>(idx) < capacity_);
+    isAllocated_[static_cast<std::size_t>(idx)] = 1;
+
     return order;
 }
 
 void OrderPool::deallocate(Order* order) {
     assert(order != nullptr);
     assert(freeCount_ < capacity_);
+
+    std::ptrdiff_t idx = order - &orders_[0];
+    assert(idx >= 0);
+    assert(static_cast<std::size_t>(idx) < capacity_);
+    assert(isAllocated_[static_cast<std::size_t>(idx)] == 1);  // catch double-deallocate
+    isAllocated_[static_cast<std::size_t>(idx)] = 0;
 
     order->next = freeList_;
     freeList_ = order;

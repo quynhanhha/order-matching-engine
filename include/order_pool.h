@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <vector>
 #include "order.h"
 
 class OrderPool {
@@ -19,4 +20,5 @@ private:
     std::unique_ptr<Order[]> orders_;
     Order* freeList_;
     std::size_t freeCount_;
+    std::vector<uint8_t> isAllocated_;
 };
