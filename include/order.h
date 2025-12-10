@@ -12,4 +12,12 @@ struct Order {
 
     Order* next;
     Order* prev;
+
+    void init(uint64_t id, uint32_t p, uint32_t qty, uint64_t seq, Side s) {
+        orderId = id;
+        price = p;
+        quantity = qty;
+        sequence = seq;
+        side = s;
+    }
 };

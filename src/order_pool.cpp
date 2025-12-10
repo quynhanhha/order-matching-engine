@@ -10,10 +10,11 @@ OrderPool::OrderPool(std::size_t capacity)
     isAllocated_(capacity, 0)
 {
     freeList_ = nullptr;
-    for (std::size_t i = 0; i < capacity_; ++i) {
-        orders_[i].next = freeList_;
-        freeList_ = &orders_[i];
+    for (std::size_t i = 0; i < capacity_ - 1; ++i) {
+        orders_[i].next = &orders_[i + 1];
     }
+    orders_[capacity_ - 1].next = nullptr;
+    freeList_ = &orders_[0];
 }
 
 Order* OrderPool::allocate() {

@@ -42,7 +42,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(LIB_SOURCES
     src/order_pool.cpp
     src/price_level.cpp
-    # src/order_book.cpp    # TODO: uncomment when implemented
+    src/order_book.cpp
 )
 
 add_library(order_matching_engine STATIC ${LIB_SOURCES})
@@ -87,9 +87,18 @@ if(BUILD_TESTS)
             GTest::gtest_main
     )
     
+    # OrderBook matching tests
+    add_executable(order_book_matching_test tests/order_book_matching_tests.cpp)
+    target_link_libraries(order_book_matching_test
+        PRIVATE
+            order_matching_engine
+            GTest::gtest_main
+    )
+    
     include(GoogleTest)
     gtest_discover_tests(order_pool_test)
     gtest_discover_tests(price_level_test)
+    gtest_discover_tests(order_book_matching_test)
     
     # TODO: uncomment when implemented
     # add_executable(order_book_test tests/order_book_test.cpp)
