@@ -37,3 +37,7 @@ void PriceLevel::remove(Order* o) {
 bool PriceLevel::isEmpty() const {
     return head == nullptr;
 }
+
+Order* PriceLevel::front() const {
+    return head;
+}

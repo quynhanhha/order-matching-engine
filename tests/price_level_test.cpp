@@ -167,3 +167,29 @@ TEST(PriceLevelTest, RemoveOnlyOrderMakesLevelEmpty) {
     EXPECT_EQ(pl.tail, nullptr);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FRONT
+// ─────────────────────────────────────────────────────────────────────────────
+
+TEST(PriceLevelTest, FrontReturnsHead) {
+    PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
+    OrderPool pool(2);
+
+    Order* o1 = pool.allocate();
+    Order* o2 = pool.allocate();
+    o1->orderId = 1; o1->quantity = 10;
+    o2->orderId = 2; o2->quantity = 20;
+
+    pl.addToTail(o1);
+    EXPECT_EQ(pl.front(), o1);
+
+    pl.addToTail(o2);
+    EXPECT_EQ(pl.front(), o1);
+}
+
+TEST(PriceLevelTest, FrontReturnsNullWhenEmpty) {
+    PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
+
+    EXPECT_EQ(pl.front(), nullptr);
+}
+
