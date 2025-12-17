@@ -95,10 +95,19 @@ if(BUILD_TESTS)
             GTest::gtest_main
     )
     
+    # Self-Match Prevention tests
+    add_executable(order_book_smp_test tests/order_book_smp_tests.cpp)
+    target_link_libraries(order_book_smp_test
+        PRIVATE
+            order_matching_engine
+            GTest::gtest_main
+    )
+    
     include(GoogleTest)
     gtest_discover_tests(order_pool_test)
     gtest_discover_tests(price_level_test)
     gtest_discover_tests(order_book_matching_test)
+    gtest_discover_tests(order_book_smp_test)
     
     # TODO: uncomment when implemented
     # add_executable(order_book_test tests/order_book_test.cpp)
