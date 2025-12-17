@@ -14,9 +14,9 @@ const PriceLevel* OrderBook::bestAsk() const {
     return asks_.empty() ? nullptr : &asks_.back();
 }
 
-void OrderBook::addLimitOrder(Side side, uint32_t price, uint32_t quantity, uint64_t id) {
+void OrderBook::addLimitOrder(Side side, uint32_t price, uint32_t quantity, uint64_t id, uint64_t participantId) {
     Order* order = pool_.allocate();
-    order->init(id, price, quantity, sequence_++, side);
+    order->init(id, price, quantity, sequence_++, side, participantId);
 
     if (side == Side::Buy) {
         if (bestAsk() != nullptr && price >= bestAsk()->price) {
@@ -48,6 +48,13 @@ void OrderBook::matchBuy(Order* incoming) {
         if (incoming->price < pl->price) { break; }
 
         Order* resting = pl->front();
+
+        if (resting->participantId == incoming->participantId) {
+            // Self-match prevention: cancel the incoming order
+            incoming->quantity = 0;
+            return;
+        }
+
         uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
 
         incoming->quantity -= fillQty;
@@ -56,7 +63,7 @@ void OrderBook::matchBuy(Order* incoming) {
 
         Trade trade(incoming->orderId, resting->orderId, pl->price, fillQty);
         onTrade_(trade);
-
+        
         if (resting->quantity == 0) {
             pl->remove(resting);
             orderIndex_.erase(resting->orderId);
@@ -75,6 +82,13 @@ void OrderBook::matchSell(Order* incoming) {
         if (incoming->price > pl->price) { break; }
 
         Order* resting = pl->front();
+
+        if (resting->participantId == incoming->participantId) {
+            // Self-match prevention: cancel the incoming order
+            incoming->quantity = 0;
+            return;
+        }
+
         uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
 
         incoming->quantity -= fillQty;
