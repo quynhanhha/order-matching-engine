@@ -23,6 +23,8 @@ private:
 
     void matchBuy(Order* incoming);
     void matchSell(Order* incoming);
+    std::vector<PriceLevel>::iterator findBidLevel(uint32_t price);
+    std::vector<PriceLevel>::iterator findAskLevel(uint32_t price);
     PriceLevel* findOrCreateBidLevel(uint32_t price);
     PriceLevel* findOrCreateAskLevel(uint32_t price);
 };
