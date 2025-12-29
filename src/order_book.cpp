@@ -1,5 +1,7 @@
 #include "order_book.h"
 
+#include <cassert>
+
 OrderBook::OrderBook(std::size_t capacity, TradeCallback callback)
     :pool_(capacity), onTrade_(callback)
 {
@@ -110,32 +112,55 @@ void OrderBook::matchSell(Order* incoming) {
     }
 }
 
-PriceLevel* OrderBook::findOrCreateBidLevel(uint32_t price) {
-    auto it = std::lower_bound(bids_.begin(), bids_.end(), price,
-    [](const PriceLevel& pl, uint32_t p) {
-        return pl.price < p;
-    });
+auto OrderBook::findBidLevel(uint32_t price) -> std::vector<PriceLevel>::iterator {
+    return std::lower_bound(bids_.begin(), bids_.end(), price,
+        [](const PriceLevel& pl, uint32_t p) { return pl.price < p; });
+}
 
+PriceLevel* OrderBook::findOrCreateBidLevel(uint32_t price) {
+    auto it = findBidLevel(price);
     if (it != bids_.end() && it->price == price) {
         return &(*it);
     }
-
     it = bids_.insert(it, PriceLevel(price));
-
     return &(*it);
 }
 
-PriceLevel* OrderBook::findOrCreateAskLevel(uint32_t price) {
-    auto it = std::lower_bound(asks_.begin(), asks_.end(), price,
-    [](const PriceLevel& pl, uint32_t p) {
-        return pl.price > p;
-    });
+auto OrderBook::findAskLevel(uint32_t price) -> std::vector<PriceLevel>::iterator {
+    return std::lower_bound(asks_.begin(), asks_.end(), price, 
+    [](const PriceLevel& pl, uint32_t p) { return pl.price > p; });
+}
 
+PriceLevel* OrderBook::findOrCreateAskLevel(uint32_t price) {
+    auto it = findAskLevel(price);
     if (it != asks_.end() && it->price == price) {
         return &(*it);
     }
-
     it = asks_.insert(it, PriceLevel(price));
-
     return &(*it);
+}
+
+void OrderBook::cancelOrder(uint64_t orderId) {
+    auto it = orderIndex_.find(orderId);
+
+    if (it == orderIndex_.end()) {
+        return;
+    }
+
+    Order* o = it->second;
+    assert(o && o->quantity > 0);
+
+    auto& levels = (o->side == Side::Buy) ? bids_ : asks_;
+    auto levelIt = (o->side == Side::Buy) ? findBidLevel(o->price) : findAskLevel(o->price);
+
+    assert(levelIt != levels.end() && levelIt->price == o->price && "Order in index but price level missing");
+
+    levelIt->remove(o);
+
+    if (levelIt->isEmpty()) {
+        levels.erase(levelIt);
+    }
+
+    orderIndex_.erase(it);
+    pool_.deallocate(o);
 }
