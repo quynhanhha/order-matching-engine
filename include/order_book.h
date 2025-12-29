@@ -8,6 +8,8 @@ public:
     OrderBook(std::size_t capacity, TradeCallback callback);
 
     void addLimitOrder(Side side, uint32_t price, uint32_t quantity, uint64_t id, uint64_t participantId);
+    void cancelOrder(uint64_t orderId);
+
     const PriceLevel* bestBid() const;
     const PriceLevel* bestAsk() const;
 

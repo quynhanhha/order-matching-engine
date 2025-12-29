@@ -1,5 +1,7 @@
 #include "order_book.h"
 
+#include <cassert>
+
 OrderBook::OrderBook(std::size_t capacity, TradeCallback callback)
     :pool_(capacity), onTrade_(callback)
 {
@@ -138,4 +140,33 @@ PriceLevel* OrderBook::findOrCreateAskLevel(uint32_t price) {
     it = asks_.insert(it, PriceLevel(price));
 
     return &(*it);
+}
+
+void OrderBook::cancelOrder(uint64_t orderId) {
+    auto it = orderIndex_.find(orderId);
+
+    if (it == orderIndex_.end()) {
+        return;
+    }
+
+    Order* o = it->second;
+    assert(o && o->quantity > 0);
+
+    auto& levels = (o->side == Side::Buy) ? bids_ : asks_;
+
+    auto levelIt = std::find_if(levels.begin(), levels.end(),
+    [price = o->price](const PriceLevel& pl) {
+        return pl.price == price;
+    });
+
+    assert(levelIt != levels.end() && "Order in index but price level missing");
+
+    levelIt->remove(o);
+
+    if (levelIt->isEmpty()) {
+        levels.erase(levelIt);
+    }
+
+    orderIndex_.erase(it);
+    pool_.deallocate(o);
 }
