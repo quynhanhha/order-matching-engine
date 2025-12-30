@@ -15,8 +15,8 @@ protected:
         trades_.clear();
     }
 
-    TradeCallback captureCallback() {
-        return [this](const Trade& t) { trades_.push_back(t); };
+    auto makeBook(std::size_t capacity = 10) {
+        return OrderBook(capacity, [this](const Trade& t) { trades_.push_back(t); });
     }
 };
 
@@ -25,7 +25,7 @@ protected:
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, BuyCancelsIncoming) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100 places a sell order
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
@@ -45,7 +45,7 @@ TEST_F(SelfMatchPreventionTest, BuyCancelsIncoming) {
 }
 
 TEST_F(SelfMatchPreventionTest, SellCancelsIncoming) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100 places a buy order
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
@@ -69,7 +69,7 @@ TEST_F(SelfMatchPreventionTest, SellCancelsIncoming) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, DifferentParticipantsCanTrade) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100 places a sell order
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
@@ -92,7 +92,7 @@ TEST_F(SelfMatchPreventionTest, DifferentParticipantsCanTrade) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, CancelsIncomingWhenOwnOrderAtFront) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100's order is FIRST in the queue (will be matched first due to FIFO)
     book.addLimitOrder(Side::Sell, 100, 30, 1, 100);  // participant 100 - first
@@ -118,7 +118,7 @@ TEST_F(SelfMatchPreventionTest, CancelsIncomingWhenOwnOrderAtFront) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, BuyAggressivePriceCrossing) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100 has a sell order
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
@@ -135,7 +135,7 @@ TEST_F(SelfMatchPreventionTest, BuyAggressivePriceCrossing) {
 }
 
 TEST_F(SelfMatchPreventionTest, SellAggressivePriceCrossing) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 100 has a buy order
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
@@ -156,7 +156,7 @@ TEST_F(SelfMatchPreventionTest, SellAggressivePriceCrossing) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, PartialFillThenSelfMatchCrossLevel) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 200 has a sell order at 100
     book.addLimitOrder(Side::Sell, 100, 20, 1, 200);
@@ -189,7 +189,7 @@ TEST_F(SelfMatchPreventionTest, PartialFillThenSelfMatchCrossLevel) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, MultiLevelBookBuySide) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 10 has asks at two price levels
     book.addLimitOrder(Side::Sell, 100, 5, 1, 10);  // best ask
@@ -212,7 +212,7 @@ TEST_F(SelfMatchPreventionTest, MultiLevelBookBuySide) {
 }
 
 TEST_F(SelfMatchPreventionTest, MultiLevelBookSellSide) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Participant 10 has bids at two price levels
     book.addLimitOrder(Side::Buy, 101, 5, 1, 10);  // best bid
@@ -240,7 +240,7 @@ TEST_F(SelfMatchPreventionTest, MultiLevelBookSellSide) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(SelfMatchPreventionTest, MidLoopBuySide) {
-    OrderBook book(20, captureCallback());
+    auto book = makeBook(20);
 
     // Three sell orders at same price level from different participants
     book.addLimitOrder(Side::Sell, 100, 5, 1, 77);  // o1: participant 77
@@ -276,7 +276,7 @@ TEST_F(SelfMatchPreventionTest, MidLoopBuySide) {
 }
 
 TEST_F(SelfMatchPreventionTest, MidLoopSellSide) {
-    OrderBook book(20, captureCallback());
+    auto book = makeBook(20);
 
     // Three buy orders at same price level from different participants
     book.addLimitOrder(Side::Buy, 100, 5, 1, 77);  // o1: participant 77

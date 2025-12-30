@@ -15,8 +15,8 @@ protected:
         trades_.clear();
     }
 
-    TradeCallback captureCallback() {
-        return [this](const Trade& t) { trades_.push_back(t); };
+    auto makeBook(std::size_t capacity = 10) {
+        return OrderBook(capacity, [this](const Trade& t) { trades_.push_back(t); });
     }
 };
 
@@ -25,7 +25,7 @@ protected:
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelNonExistentOrderIsNoOp) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     // Should not crash or throw
     book.cancelOrder(999);
@@ -36,7 +36,7 @@ TEST_F(OrderBookCancelTest, CancelNonExistentOrderIsNoOp) {
 }
 
 TEST_F(OrderBookCancelTest, CancelAlreadyCancelledOrderIsNoOp) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
     book.cancelOrder(1);
@@ -53,7 +53,7 @@ TEST_F(OrderBookCancelTest, CancelAlreadyCancelledOrderIsNoOp) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelHeadBidLeavesRemainingOrders) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Buy, 100, 20, 2, 101);  // middle
@@ -67,7 +67,7 @@ TEST_F(OrderBookCancelTest, CancelHeadBidLeavesRemainingOrders) {
 }
 
 TEST_F(OrderBookCancelTest, CancelHeadAskLeavesRemainingOrders) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Sell, 100, 20, 2, 101);  // middle
@@ -85,7 +85,7 @@ TEST_F(OrderBookCancelTest, CancelHeadAskLeavesRemainingOrders) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelMiddleBidLeavesHeadAndTail) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Buy, 100, 20, 2, 101);  // middle
@@ -99,7 +99,7 @@ TEST_F(OrderBookCancelTest, CancelMiddleBidLeavesHeadAndTail) {
 }
 
 TEST_F(OrderBookCancelTest, CancelMiddleAskLeavesHeadAndTail) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Sell, 100, 20, 2, 101);  // middle
@@ -117,7 +117,7 @@ TEST_F(OrderBookCancelTest, CancelMiddleAskLeavesHeadAndTail) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelTailBidLeavesHeadAndMiddle) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Buy, 100, 20, 2, 101);  // middle
@@ -131,7 +131,7 @@ TEST_F(OrderBookCancelTest, CancelTailBidLeavesHeadAndMiddle) {
 }
 
 TEST_F(OrderBookCancelTest, CancelTailAskLeavesHeadAndMiddle) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 10, 1, 100);  // head
     book.addLimitOrder(Side::Sell, 100, 20, 2, 101);  // middle
@@ -149,7 +149,7 @@ TEST_F(OrderBookCancelTest, CancelTailAskLeavesHeadAndMiddle) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelOnlyBidRemovesPriceLevel) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
 
@@ -162,7 +162,7 @@ TEST_F(OrderBookCancelTest, CancelOnlyBidRemovesPriceLevel) {
 }
 
 TEST_F(OrderBookCancelTest, CancelOnlyAskRemovesPriceLevel) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
 
@@ -179,7 +179,7 @@ TEST_F(OrderBookCancelTest, CancelOnlyAskRemovesPriceLevel) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookCancelTest, CancelBestBidUpdatesToNextLevel) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 102, 10, 1, 100);  // best bid
     book.addLimitOrder(Side::Buy, 101, 20, 2, 101);  // second best
@@ -194,7 +194,7 @@ TEST_F(OrderBookCancelTest, CancelBestBidUpdatesToNextLevel) {
 }
 
 TEST_F(OrderBookCancelTest, CancelBestAskUpdatesToNextLevel) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 10, 1, 100);  // best ask
     book.addLimitOrder(Side::Sell, 101, 20, 2, 101);  // second best
@@ -209,7 +209,7 @@ TEST_F(OrderBookCancelTest, CancelBestAskUpdatesToNextLevel) {
 }
 
 TEST_F(OrderBookCancelTest, CancelNonBestLevelDoesNotAffectBest) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 102, 10, 1, 100);  // best bid
     book.addLimitOrder(Side::Buy, 100, 20, 2, 101);  // worse bid

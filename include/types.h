@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <cstdint>
 
 enum class Side { Buy, Sell };
@@ -11,5 +10,3 @@ struct Trade {
     uint32_t price;
     uint32_t quantity;
 };
-
-using TradeCallback = std::function<void(const Trade&)>;
