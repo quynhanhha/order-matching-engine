@@ -15,8 +15,8 @@ protected:
         trades_.clear();
     }
 
-    TradeCallback captureCallback() {
-        return [this](const Trade& t) { trades_.push_back(t); };
+    auto makeBook(std::size_t capacity = 10) {
+        return OrderBook(capacity, [this](const Trade& t) { trades_.push_back(t); });
     }
 };
 
@@ -25,7 +25,7 @@ protected:
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuyOrderRestsWhenNoAsks) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
 
@@ -37,7 +37,7 @@ TEST_F(OrderBookMatchingTest, BuyOrderRestsWhenNoAsks) {
 }
 
 TEST_F(OrderBookMatchingTest, SellOrderRestsWhenNoBids) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
 
@@ -49,7 +49,7 @@ TEST_F(OrderBookMatchingTest, SellOrderRestsWhenNoBids) {
 }
 
 TEST_F(OrderBookMatchingTest, BuyOrderRestsWhenPriceBelowBestAsk) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);  // ask @ 100
     book.addLimitOrder(Side::Buy, 99, 50, 2, 200);    // buy @ 99, no cross
@@ -62,7 +62,7 @@ TEST_F(OrderBookMatchingTest, BuyOrderRestsWhenPriceBelowBestAsk) {
 }
 
 TEST_F(OrderBookMatchingTest, SellOrderRestsWhenPriceAboveBestBid) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);   // bid @ 100
     book.addLimitOrder(Side::Sell, 101, 50, 2, 200);  // sell @ 101, no cross
@@ -79,7 +79,7 @@ TEST_F(OrderBookMatchingTest, SellOrderRestsWhenPriceAboveBestBid) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuyExactlyFillsSell) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
     book.addLimitOrder(Side::Buy, 100, 50, 2, 200);
@@ -95,7 +95,7 @@ TEST_F(OrderBookMatchingTest, BuyExactlyFillsSell) {
 }
 
 TEST_F(OrderBookMatchingTest, SellExactlyFillsBuy) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
     book.addLimitOrder(Side::Sell, 100, 50, 2, 200);
@@ -115,7 +115,7 @@ TEST_F(OrderBookMatchingTest, SellExactlyFillsBuy) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuyPartiallyFillsRemainderRests) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 30, 1, 100);  // resting 30
     book.addLimitOrder(Side::Buy, 100, 50, 2, 200);   // incoming 50
@@ -133,7 +133,7 @@ TEST_F(OrderBookMatchingTest, BuyPartiallyFillsRemainderRests) {
 }
 
 TEST_F(OrderBookMatchingTest, SellPartiallyFillsRemainderRests) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 30, 1, 100);   // resting 30
     book.addLimitOrder(Side::Sell, 100, 50, 2, 200);  // incoming 50
@@ -155,7 +155,7 @@ TEST_F(OrderBookMatchingTest, SellPartiallyFillsRemainderRests) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuyPartiallyFillsRestingRemains) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);  // resting 50
     book.addLimitOrder(Side::Buy, 100, 30, 2, 200);   // incoming 30
@@ -173,7 +173,7 @@ TEST_F(OrderBookMatchingTest, BuyPartiallyFillsRestingRemains) {
 }
 
 TEST_F(OrderBookMatchingTest, SellPartiallyFillsRestingRemains) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);   // resting 50
     book.addLimitOrder(Side::Sell, 100, 30, 2, 200);  // incoming 30
@@ -195,7 +195,7 @@ TEST_F(OrderBookMatchingTest, SellPartiallyFillsRestingRemains) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuySweepsMultipleOrdersSamePriceFIFO) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 20, 1, 100);  // first
     book.addLimitOrder(Side::Sell, 100, 30, 2, 101);  // second
@@ -222,7 +222,7 @@ TEST_F(OrderBookMatchingTest, BuySweepsMultipleOrdersSamePriceFIFO) {
 }
 
 TEST_F(OrderBookMatchingTest, SellSweepsMultipleOrdersSamePriceFIFO) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 20, 1, 100);   // first
     book.addLimitOrder(Side::Buy, 100, 30, 2, 101);   // second
@@ -253,7 +253,7 @@ TEST_F(OrderBookMatchingTest, SellSweepsMultipleOrdersSamePriceFIFO) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuySweepsMultiplePriceLevelsBestFirst) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 20, 1, 100);  // best ask
     book.addLimitOrder(Side::Sell, 101, 30, 2, 101);  // worse ask
@@ -280,7 +280,7 @@ TEST_F(OrderBookMatchingTest, BuySweepsMultiplePriceLevelsBestFirst) {
 }
 
 TEST_F(OrderBookMatchingTest, SellSweepsMultiplePriceLevelsBestFirst) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 101, 20, 1, 100);  // best bid
     book.addLimitOrder(Side::Buy, 100, 30, 2, 101);  // worse bid
@@ -311,7 +311,7 @@ TEST_F(OrderBookMatchingTest, SellSweepsMultiplePriceLevelsBestFirst) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, BuyWithPriceImprovementMatchesAtAskPrice) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 50, 1, 100);
     book.addLimitOrder(Side::Buy, 105, 50, 2, 200);  // willing to pay more
@@ -327,7 +327,7 @@ TEST_F(OrderBookMatchingTest, BuyWithPriceImprovementMatchesAtAskPrice) {
 }
 
 TEST_F(OrderBookMatchingTest, SellWithPriceImprovementMatchesAtBidPrice) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 50, 1, 100);
     book.addLimitOrder(Side::Sell, 95, 50, 2, 200);  // willing to accept less
@@ -347,7 +347,7 @@ TEST_F(OrderBookMatchingTest, SellWithPriceImprovementMatchesAtBidPrice) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST_F(OrderBookMatchingTest, PriceLevelRemovedWhenAllOrdersFilled) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Sell, 100, 20, 1, 100);
     book.addLimitOrder(Side::Sell, 100, 30, 2, 101);
@@ -372,7 +372,7 @@ TEST_F(OrderBookMatchingTest, PriceLevelRemovedWhenAllOrdersFilled) {
 }
 
 TEST_F(OrderBookMatchingTest, MultiplePriceLevelsOrdered) {
-    OrderBook book(10, captureCallback());
+    auto book = makeBook();
 
     book.addLimitOrder(Side::Buy, 100, 10, 1, 100);
     book.addLimitOrder(Side::Buy, 102, 10, 2, 101);  // best bid
