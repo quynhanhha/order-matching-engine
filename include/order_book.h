@@ -93,26 +93,31 @@ private:
     uint64_t sequence_ = 0;
 
     void matchBuy(Order* incoming) {
-        while (incoming->quantity > 0 && !asks_.empty()) {
-            PriceLevel* pl = &asks_.back();
-            if (incoming->price < pl->price) { break; }
+        if (asks_.empty()) return;
+        
+        // Cache: avoid repeated .size()/.empty()/.back() calls
+        auto* levels = asks_.data();
+        auto numLevels = asks_.size();
+        auto* pl = levels + numLevels - 1;  // best ask (back)
+        const auto incomingPrice = incoming->price;
+        
+        while (incoming->quantity > 0 && numLevels > 0) {
+            if (incomingPrice < pl->price) { break; }
 
-            Order* resting = pl->front();
+            Order* resting = pl->head;  // inlined front()
 
             if (resting->participantId == incoming->participantId) {
-                // Self-match prevention: cancel the incoming order
                 incoming->quantity = 0;
-                return;
+                break;  // defer cleanup to end
             }
 
-            uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
+            const uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
 
             incoming->quantity -= fillQty;
             resting->quantity -= fillQty;
             pl->totalQuantity -= fillQty;
 
-            Trade trade(incoming->orderId, resting->orderId, pl->price, fillQty);
-            onTrade_(trade);
+            onTrade_(Trade{incoming->orderId, resting->orderId, pl->price, fillQty});
 
             if (resting->quantity == 0) {
                 pl->remove(resting);
@@ -120,33 +125,42 @@ private:
                 pool_.deallocate(resting);
             }
 
-            if (pl->isEmpty()) {
-                asks_.pop_back();
+            if (pl->head == nullptr) {  // inlined isEmpty()
+                --numLevels;
+                --pl;
             }
         }
+        
+        // Batch resize: single operation instead of repeated pop_back()
+        asks_.resize(numLevels);
     }
 
     void matchSell(Order* incoming) {
-        while (incoming->quantity > 0 && !bids_.empty()) {
-            PriceLevel* pl = &bids_.back();
-            if (incoming->price > pl->price) { break; }
+        if (bids_.empty()) return;
+        
+        // Cache: avoid repeated .size()/.empty()/.back() calls
+        auto* levels = bids_.data();
+        auto numLevels = bids_.size();
+        auto* pl = levels + numLevels - 1;  // best bid (back)
+        const auto incomingPrice = incoming->price;
+        
+        while (incoming->quantity > 0 && numLevels > 0) {
+            if (incomingPrice > pl->price) { break; }
 
-            Order* resting = pl->front();
+            Order* resting = pl->head;  // inlined front()
 
             if (resting->participantId == incoming->participantId) {
-                // Self-match prevention: cancel the incoming order
                 incoming->quantity = 0;
-                return;
+                break;  // defer cleanup to end
             }
 
-            uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
+            const uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
 
             incoming->quantity -= fillQty;
             resting->quantity -= fillQty;
             pl->totalQuantity -= fillQty;
 
-            Trade trade(resting->orderId, incoming->orderId, pl->price, fillQty);
-            onTrade_(trade);
+            onTrade_(Trade{resting->orderId, incoming->orderId, pl->price, fillQty});
 
             if (resting->quantity == 0) {
                 pl->remove(resting);
@@ -154,10 +168,14 @@ private:
                 pool_.deallocate(resting);
             }
 
-            if (pl->isEmpty()) {
-                bids_.pop_back();
+            if (pl->head == nullptr) {  // inlined isEmpty()
+                --numLevels;
+                --pl;
             }
         }
+        
+        // Batch resize: single operation instead of repeated pop_back()
+        bids_.resize(numLevels);
     }
 
     auto findBidLevel(uint32_t price) -> std::vector<PriceLevel>::iterator {
