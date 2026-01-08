@@ -1,7 +1,6 @@
 # Performance Profiling Report
 
 **Date:** 2025-01-03  
-**Branch:** `feature/cancel-execution`
 
 ---
 
