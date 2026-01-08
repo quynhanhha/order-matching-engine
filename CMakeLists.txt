@@ -13,7 +13,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Compiler Flags
 # ─────────────────────────────────────────────────────────────────────────────
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    add_compile_options(
+    # Strict warnings (added per-target, not globally for dependencies)
+    set(PROJECT_WARNING_FLAGS
         -Wall
         -Wextra
         -Wpedantic
@@ -46,6 +47,7 @@ set(LIB_SOURCES
 
 add_library(order_matching_engine STATIC ${LIB_SOURCES})
 target_include_directories(order_matching_engine PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_compile_options(order_matching_engine PRIVATE ${PROJECT_WARNING_FLAGS})
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main Executable (disabled until order_book is implemented)
@@ -137,7 +139,7 @@ if(BUILD_TESTS)
 endif()
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Benchmarking (Google Benchmark) - disabled until order_book is implemented
+# Benchmarking (Google Benchmark)
 # ─────────────────────────────────────────────────────────────────────────────
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 
@@ -153,6 +155,7 @@ if(BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(benchmark)
     
+    # Google Benchmark suite
     add_executable(order_book_bench benchmarks/order_book_bench.cpp)
     target_link_libraries(order_book_bench
         PRIVATE
@@ -160,8 +163,17 @@ if(BUILD_BENCHMARKS)
             benchmark::benchmark
             benchmark::benchmark_main
     )
+    target_compile_options(order_book_bench PRIVATE -O3 -DNDEBUG -march=native)
+    target_compile_definitions(order_book_bench PRIVATE NDEBUG)
     
-    target_compile_options(order_book_bench PRIVATE -O3 -march=native)
+    # Latency percentile tool (standalone, no Google Benchmark dependency)
+    add_executable(latency_percentiles benchmarks/latency_percentiles.cpp)
+    target_link_libraries(latency_percentiles
+        PRIVATE
+            order_matching_engine
+    )
+    target_compile_options(latency_percentiles PRIVATE -O3 -DNDEBUG -march=native)
+    target_compile_definitions(latency_percentiles PRIVATE NDEBUG)
 endif()
 
 # ─────────────────────────────────────────────────────────────────────────────
