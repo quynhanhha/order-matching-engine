@@ -179,8 +179,7 @@ Batched to overcome timer resolution; ~2-3 ns is plausible for inlined vector ac
 | p99 | 3 ns |
 | Max | 11 ns |
 
-*Note: Sub-5ns measurements are at the limit of timing precision. The key property
-is O(1) constant-time access regardless of book size.*
+*Note: Sub-5ns measurements are at the limit of timing precision. The key property is O(1) constant-time access regardless of book size.*
 
 ---
 
