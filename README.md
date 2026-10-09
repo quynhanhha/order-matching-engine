@@ -10,7 +10,7 @@ A C++20 limit order book and matching engine with price–time priority, partial
 - A synchronous, templated callback receives each trade's buy order ID, sell order ID, price, and quantity.
 - Best bid/ask access returns the best price level in constant time.
 
-The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply unique order IDs, positive quantities, and sufficient pool capacity. Duplicate IDs are not detected and are unsupported: they can leave resting orders uncancellable ([correctness finding](docs/profiling-report.md#82-correctness-finding-duplicate-order-ids)).
+The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply positive quantities and sufficient pool capacity. Order IDs must be unique among resting orders within each book, across both sides and all participants. `addLimitOrder` throws `std::invalid_argument` if an incoming ID already exists in the resting-order index, before allocating an order, changing book state, or invoking the trade callback. This check also applies to incoming orders that would execute immediately or encounter self-match prevention. IDs may be reused after cancellation or full execution; an incoming ID is also reusable after self-match prevention cancels its remainder. Partial fills keep an ID reserved while its remainder rests. The [profiling report](docs/profiling-report.md#82-correctness-finding-duplicate-order-ids) records the historical defect that motivated this check.
 
 ## Architecture and memory management
 

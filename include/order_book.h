@@ -4,6 +4,7 @@
 #include "price_level.h"
 
 #include <cassert>
+#include <stdexcept>
 #include <unordered_map>
 
 namespace detail {
@@ -23,6 +24,10 @@ public:
     }
 
     void addLimitOrder(Side side, uint32_t price, uint32_t quantity, uint64_t id, uint64_t participantId) {
+        if (orderIndex_.contains(id)) {
+            throw std::invalid_argument("Duplicate live order ID");
+        }
+
         Order* order = pool_.allocate();
         order->init(id, price, quantity, sequence_++, side, participantId);
 
