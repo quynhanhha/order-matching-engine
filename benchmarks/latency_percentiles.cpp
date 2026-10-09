@@ -13,10 +13,6 @@
 
 #include "order_book.h"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HIGH-RESOLUTION TIMER (platform-specific)
-// ─────────────────────────────────────────────────────────────────────────────
-
 class HighResTimer {
 public:
     HighResTimer() {
@@ -34,7 +30,6 @@ public:
 #endif
     }
 
-    // Convert ticks to nanoseconds
     uint64_t toNanos(uint64_t ticks) const {
 #ifdef __APPLE__
         return ticks * timebase_.numer / timebase_.denom;
@@ -49,11 +44,6 @@ private:
     mach_timebase_info_data_t timebase_;
 #endif
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LATENCY COLLECTOR
-// Using batch timing to avoid timer overhead artifacts
-// ─────────────────────────────────────────────────────────────────────────────
 
 class LatencyCollector {
 public:
@@ -87,7 +77,6 @@ public:
         int64_t sum = std::accumulate(samples_.begin(), samples_.end(), int64_t{0});
         double mean = static_cast<double>(sum) / static_cast<double>(samples_.size());
 
-        // Compute stddev
         double variance = 0.0;
         for (int64_t s : samples_) {
             double diff = static_cast<double>(s) - mean;
@@ -113,10 +102,6 @@ public:
 private:
     std::vector<int64_t> samples_;
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// INPUT GENERATION
-// ─────────────────────────────────────────────────────────────────────────────
 
 struct OrderInput {
     Side side;
@@ -147,15 +132,7 @@ std::vector<OrderInput> generateRestingOrders(std::size_t count, std::mt19937_64
     return inputs;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NO-OP CALLBACK
-// ─────────────────────────────────────────────────────────────────────────────
-
 inline void noOpCallback(const Trade&) {}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ESCAPE SINK (Prevent compiler from eliminating "unused" values)
-// ─────────────────────────────────────────────────────────────────────────────
 
 static volatile uint64_t g_sink = 0;
 
@@ -168,10 +145,6 @@ inline void clobber() {
     asm volatile("" : : : "memory");
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// WARMUP
-// ─────────────────────────────────────────────────────────────────────────────
-
 void warmup() {
     OrderBook book(10000, noOpCallback);
     for (uint64_t i = 0; i < 5000; ++i) {
@@ -182,12 +155,7 @@ void warmup() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK FUNCTIONS
-// Using batch timing: time BATCH_SIZE ops, record total / BATCH_SIZE
-// This avoids timer overhead dominating small operations
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Single operations are below timer resolution, so time batches and record the per-op mean.
 constexpr std::size_t BATCH_SIZE = 100;
 
 void benchmarkAddResting(std::size_t batches, const HighResTimer& timer) {
@@ -216,7 +184,6 @@ void benchmarkAddResting(std::size_t batches, const HighResTimer& timer) {
         uint64_t totalNanos = timer.toNanos(end - start);
         collector.record(totalNanos / BATCH_SIZE);
         
-        // Cancel batch to keep book bounded
         for (std::size_t i = 0; i < BATCH_SIZE; ++i) {
             book.cancelOrder(id - i);
         }
@@ -226,19 +193,9 @@ void benchmarkAddResting(std::size_t batches, const HighResTimer& timer) {
 }
 
 void benchmarkAddCrossing(std::size_t batches, const HighResTimer& timer) {
-    // This measures the FULL addLimitOrder() API call for a crossing order:
-    // - Price level lookup
-    // - Order matching (fills against resting)
-    // - Trade callback invocation
-    // - Order removal from price level if fully filled
-    // - Hash index operations
-    //
-    // This is the end-to-end "add crossing order" latency as seen by the API caller.
-    
     LatencyCollector collector(batches);
     constexpr std::size_t MATCH_BATCH = 100;
     
-    // Pre-build book with resting sells
     OrderBook book(batches * MATCH_BATCH * 3 + 1000, noOpCallback);
     
     uint64_t restingId = 1;
@@ -252,7 +209,6 @@ void benchmarkAddCrossing(std::size_t batches, const HighResTimer& timer) {
         uint64_t start = timer.now();
         
         for (std::size_t i = 0; i < MATCH_BATCH; ++i) {
-            // Aggressive buy that fully matches one resting sell
             book.addLimitOrder(Side::Buy, 100, 1, matchId++, 2);
         }
         
@@ -262,7 +218,6 @@ void benchmarkAddCrossing(std::size_t batches, const HighResTimer& timer) {
         uint64_t totalNanos = timer.toNanos(end - start);
         collector.record(totalNanos / MATCH_BATCH);
         
-        // Replenish the batch (outside timing)
         for (std::size_t i = 0; i < MATCH_BATCH; ++i) {
             book.addLimitOrder(Side::Sell, 100, 1, restingId++, 1);
         }
@@ -272,22 +227,16 @@ void benchmarkAddCrossing(std::size_t batches, const HighResTimer& timer) {
 }
 
 void benchmarkCancel(std::size_t batches, const HighResTimer& timer) {
-    // Stable-state cancel benchmark:
-    // - Book maintains constant size (~BOOK_SIZE orders)
-    // - Each batch cancels CANCEL_BATCH random orders
-    // - After timing, replenish those same orders
-    // - This avoids book-draining artifacts
-    
+    // Cancelled orders are replenished outside timing so the book size stays constant.
     std::mt19937_64 rng(42);
     LatencyCollector collector(batches);
     
     constexpr std::size_t CANCEL_BATCH = 100;
-    constexpr std::size_t BOOK_SIZE = 10000;  // Stable book size
+    constexpr std::size_t BOOK_SIZE = 10000;
     
     std::uniform_int_distribution<uint32_t> qtyDist(1, 100);
     std::uniform_int_distribution<uint32_t> priceDist(0, 9);
     
-    // Pre-populate book with BOOK_SIZE orders
     OrderBook book(BOOK_SIZE + CANCEL_BATCH + 1000, noOpCallback);
     std::vector<uint64_t> activeIds;
     activeIds.reserve(BOOK_SIZE);
@@ -302,7 +251,6 @@ void benchmarkCancel(std::size_t batches, const HighResTimer& timer) {
     uint64_t nextId = BOOK_SIZE + 1;
     
     for (std::size_t batch = 0; batch < batches; ++batch) {
-        // Select CANCEL_BATCH random orders to cancel
         std::vector<uint64_t> toCancel;
         toCancel.reserve(CANCEL_BATCH);
         
@@ -311,7 +259,6 @@ void benchmarkCancel(std::size_t batches, const HighResTimer& timer) {
             toCancel.push_back(activeIds[i]);
         }
         
-        // Time the cancellations
         uint64_t start = timer.now();
         
         for (uint64_t id : toCancel) {
@@ -324,7 +271,6 @@ void benchmarkCancel(std::size_t batches, const HighResTimer& timer) {
         uint64_t totalNanos = timer.toNanos(end - start);
         collector.record(totalNanos / CANCEL_BATCH);
         
-        // Replenish: remove cancelled IDs, add new orders (outside timing)
         for (uint64_t id : toCancel) {
             activeIds.erase(std::find(activeIds.begin(), activeIds.end(), id));
         }
@@ -344,7 +290,6 @@ void benchmarkMultiLevelSweep(std::size_t iterations, std::size_t numLevels, con
     LatencyCollector collector(iterations);
     const auto sweepQty = static_cast<uint32_t>(numLevels * 10);
     
-    // Pre-build book
     OrderBook book(numLevels * iterations * 2 + 1000, noOpCallback);
     
     uint64_t nextId = 1;
@@ -357,7 +302,6 @@ void benchmarkMultiLevelSweep(std::size_t iterations, std::size_t numLevels, con
     for (std::size_t i = 0; i < iterations; ++i) {
         uint64_t start = timer.now();
         
-        // Aggressive buy sweeps all levels
         book.addLimitOrder(Side::Buy, 100 + static_cast<uint32_t>(numLevels), 
                           sweepQty, sweepId++, 2);
         
@@ -366,7 +310,6 @@ void benchmarkMultiLevelSweep(std::size_t iterations, std::size_t numLevels, con
         
         collector.record(timer.toNanos(end - start));
         
-        // Replenish all levels
         for (std::size_t j = 0; j < numLevels; ++j) {
             book.addLimitOrder(Side::Sell, 100 + static_cast<uint32_t>(j), 10, nextId++, 1);
         }
@@ -376,19 +319,12 @@ void benchmarkMultiLevelSweep(std::size_t iterations, std::size_t numLevels, con
 }
 
 void benchmarkBestBidAskAccess(std::size_t batches, const HighResTimer& timer) {
-    // Best bid/ask access is O(1) - just returns pointer to vector.back()
-    // Individual access is below timer resolution (~41ns), so we batch.
-    // 
-    // To prevent compiler from hoisting, we use volatile reads and 
-    // modify the book BETWEEN batches (not inside timing).
-    
     std::mt19937_64 rng(42);
     LatencyCollector collector(batches);
     
     std::uniform_int_distribution<uint32_t> priceDist(50, 80);
     constexpr std::size_t ACCESS_BATCH = 1000;
     
-    // Build a reasonably populated book
     OrderBook book(batches + 10000, noOpCallback);
     auto inputs = generateRestingOrders(1000, rng);
     for (const auto& input : inputs) {
@@ -396,7 +332,7 @@ void benchmarkBestBidAskAccess(std::size_t batches, const HighResTimer& timer) {
     }
     
     uint64_t id = 10000;
-    volatile uint64_t sink = 0;  // Prevent optimization
+    volatile uint64_t sink = 0;
     
     for (std::size_t batch = 0; batch < batches; ++batch) {
         uint64_t start = timer.now();
@@ -404,7 +340,6 @@ void benchmarkBestBidAskAccess(std::size_t batches, const HighResTimer& timer) {
         for (std::size_t i = 0; i < ACCESS_BATCH; ++i) {
             auto* bid = book.bestBid();
             auto* ask = book.bestAsk();
-            // Force the reads to happen
             if (bid) sink += bid->price;
             if (ask) sink += ask->price;
         }
@@ -422,7 +357,6 @@ void benchmarkBestBidAskAccess(std::size_t batches, const HighResTimer& timer) {
         ++id;
     }
     
-    // Use sink to prevent DCE
     g_sink = sink;
     
     collector.computeAndPrint("Best Bid/Ask Access [batched " + std::to_string(ACCESS_BATCH) + " pairs]");
@@ -448,7 +382,6 @@ void benchmarkMixedWorkload(std::size_t iterations, const HighResTimer& timer) {
         int roll = opDist(rng);
         
         if (roll <= 70) {
-            // Add resting (70%)
             bool isBuy = (nextId % 2 == 0);
             uint32_t price = isBuy ? 90 + priceDist(rng) : 110 + priceDist(rng);
             
@@ -462,7 +395,6 @@ void benchmarkMixedWorkload(std::size_t iterations, const HighResTimer& timer) {
             ++nextId;
             
         } else if (roll <= 90 && !activeIds.empty()) {
-            // Cancel (20%)
             std::uniform_int_distribution<std::size_t> idxDist(0, activeIds.size() - 1);
             std::size_t idx = idxDist(rng);
             uint64_t id = activeIds[idx];
@@ -476,7 +408,6 @@ void benchmarkMixedWorkload(std::size_t iterations, const HighResTimer& timer) {
             activeIds.erase(activeIds.begin() + static_cast<std::ptrdiff_t>(idx));
             
         } else {
-            // Add crossing (10%)
             bool isBuy = (nextId % 2 == 0);
             uint32_t price = isBuy ? 150 : 50;
             
@@ -496,12 +427,8 @@ void benchmarkMixedWorkload(std::size_t iterations, const HighResTimer& timer) {
     matchCollector.computeAndPrint("Add (Crossing/Match)");
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN
-// ─────────────────────────────────────────────────────────────────────────────
-
 int main(int argc, char** argv) {
-    std::size_t iterations = 10000;  // reduced for batched measurements
+    std::size_t iterations = 10000;
     
     if (argc > 1) {
         iterations = static_cast<std::size_t>(std::stoul(argv[1]));

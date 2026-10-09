@@ -60,7 +60,6 @@ inline MatchingInputs generateMatchingOrders(std::size_t numResting) {
 }
 
 // Destructively inspect every level and its FIFO, then cancel each validated order.
-// This runs only in untimed preflight, with the same inputs and pool capacity.
 template<typename Callback>
 inline std::string validateAndDrain(
     OrderBook<Callback>& book, const std::vector<OrderInput>& expected) {

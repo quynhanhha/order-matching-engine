@@ -3,10 +3,6 @@
 
 #include "order_pool.h"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONSTRUCTION
-// ─────────────────────────────────────────────────────────────────────────────
-
 TEST(OrderPoolTest, ConstructorInitializesCorrectly) {
     const std::size_t N = 10;
     OrderPool pool(N);
@@ -14,10 +10,6 @@ TEST(OrderPoolTest, ConstructorInitializesCorrectly) {
     EXPECT_EQ(pool.capacity(), N);
     EXPECT_EQ(pool.freeCount(), N);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ALLOCATION
-// ─────────────────────────────────────────────────────────────────────────────
 
 TEST(OrderPoolTest, AllocatesUpToCapacity) {
     const std::size_t N = 4;
@@ -62,10 +54,6 @@ TEST(OrderPoolTest, AllocatedOrderHasNullPrevNext) {
     EXPECT_EQ(o2->prev, nullptr);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DEALLOCATION
-// ─────────────────────────────────────────────────────────────────────────────
-
 TEST(OrderPoolTest, DeallocateIncreasesFreeCount) {
     OrderPool pool(2);
 
@@ -79,10 +67,6 @@ TEST(OrderPoolTest, DeallocateIncreasesFreeCount) {
     pool.deallocate(o2);
     EXPECT_EQ(pool.freeCount(), 2);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// REUSE / LIFO BEHAVIOR
-// ─────────────────────────────────────────────────────────────────────────────
 
 TEST(OrderPoolTest, ReusesDeallocatedOrders) {
     OrderPool pool(1);
@@ -120,10 +104,6 @@ TEST(OrderPoolTest, DeallocateAllocateIsLIFO) {
     EXPECT_EQ(pool.allocate(), o1);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FULL CYCLE
-// ─────────────────────────────────────────────────────────────────────────────
-
 TEST(OrderPoolTest, FullCycle) {
     const std::size_t N = 5;
     OrderPool pool(N);
@@ -147,10 +127,6 @@ TEST(OrderPoolTest, FullCycle) {
     }
     EXPECT_EQ(pool.freeCount(), 0);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DEATH TESTS
-// ─────────────────────────────────────────────────────────────────────────────
 
 TEST(OrderPoolDeathTest, AllocateWhenEmptyAsserts) {
     OrderPool pool(1);

@@ -3,10 +3,6 @@
 #include "price_level.h"
 #include "order_pool.h"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONSTRUCTION / EMPTY STATE
-// ─────────────────────────────────────────────────────────────────────────────
-
 TEST(PriceLevelTest, StartsEmpty) {
     PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
 
@@ -15,10 +11,6 @@ TEST(PriceLevelTest, StartsEmpty) {
     EXPECT_EQ(pl.head, nullptr);
     EXPECT_EQ(pl.tail, nullptr);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ADD ORDERS
-// ─────────────────────────────────────────────────────────────────────────────
 
 TEST(PriceLevelTest, AddSingleOrder) {
     PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
@@ -55,23 +47,17 @@ TEST(PriceLevelTest, FIFOOrdering) {
     pl.addToTail(o2);
     pl.addToTail(o3);
 
-    // Traverse from head: o1 -> o2 -> o3
     EXPECT_EQ(pl.head, o1);
     EXPECT_EQ(pl.head->next, o2);
     EXPECT_EQ(pl.head->next->next, o3);
     EXPECT_EQ(pl.tail, o3);
 
-    // Backward links
     EXPECT_EQ(o3->prev, o2);
     EXPECT_EQ(o2->prev, o1);
     EXPECT_EQ(o1->prev, nullptr);
 
     EXPECT_EQ(pl.totalQuantity, 60);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// REMOVE ORDERS
-// ─────────────────────────────────────────────────────────────────────────────
 
 TEST(PriceLevelTest, RemoveHead) {
     PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
@@ -95,7 +81,7 @@ TEST(PriceLevelTest, RemoveHead) {
     EXPECT_EQ(pl.tail, o3);
     EXPECT_EQ(o2->prev, nullptr);
     EXPECT_EQ(o2->next, o3);
-    EXPECT_EQ(pl.totalQuantity, 50);  // 20 + 30
+    EXPECT_EQ(pl.totalQuantity, 50);
 }
 
 TEST(PriceLevelTest, RemoveTail) {
@@ -167,10 +153,6 @@ TEST(PriceLevelTest, RemoveOnlyOrderMakesLevelEmpty) {
     EXPECT_EQ(pl.tail, nullptr);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FRONT
-// ─────────────────────────────────────────────────────────────────────────────
-
 TEST(PriceLevelTest, FrontReturnsHead) {
     PriceLevel pl{.price = 100, .totalQuantity = 0, .head = nullptr, .tail = nullptr};
     OrderPool pool(2);
@@ -192,4 +174,3 @@ TEST(PriceLevelTest, FrontReturnsNullWhenEmpty) {
 
     EXPECT_EQ(pl.front(), nullptr);
 }
-

@@ -7,24 +7,18 @@
 #include "order_book.h"
 #include "throughput_workloads.h"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INPUT GENERATORS (Pre-computed, no RNG in timed loops)
-// ─────────────────────────────────────────────────────────────────────────────
-
 using OrderInput = throughput_workloads::OrderInput;
 
 class InputGenerator {
 public:
     explicit InputGenerator(uint64_t seed = 42) : rng_(seed) {}
 
-    // Non-crossing orders that will rest in book
     std::vector<OrderInput> generateRestingOrders(std::size_t count, 
                                                    uint32_t bidStart = 90, 
                                                    uint32_t askStart = 110) {
         return throughput_workloads::generateRestingOrders(count, rng_, bidStart, askStart);
     }
 
-    // Aggressive crossing orders
     std::vector<OrderInput> generateCrossingOrders(std::size_t count,
                                                     uint32_t crossPrice = 100) {
         std::vector<OrderInput> inputs;
@@ -35,7 +29,6 @@ public:
         
         for (std::size_t i = 0; i < count; ++i) {
             bool isBuy = (i % 2 == 0);
-            // Buy at high price crosses asks, Sell at low price crosses bids
             uint32_t price = isBuy ? crossPrice + 50 : crossPrice - 50;
             inputs.push_back({
                 isBuy ? Side::Buy : Side::Sell,
@@ -48,7 +41,6 @@ public:
         return inputs;
     }
 
-    // Cancel targets (order IDs to cancel)
     std::vector<uint64_t> generateCancelTargets(std::size_t count, uint64_t maxId) {
         std::vector<uint64_t> targets;
         targets.reserve(count);
@@ -60,7 +52,6 @@ public:
         return targets;
     }
 
-    // Mixed workload: 70% add-rest, 20% cancel, 10% add-cross
     enum class OpType { AddRest, Cancel, AddCross };
     
     struct MixedOp {
@@ -87,7 +78,6 @@ public:
             MixedOp op{};
             
             if (roll <= 70) {
-                // Add resting (70%)
                 op.type = OpType::AddRest;
                 bool isBuy = (nextId % 2 == 0);
                 op.order = {
@@ -100,14 +90,12 @@ public:
                 activeIds.push_back(nextId);
                 ++nextId;
             } else if (roll <= 90 && !activeIds.empty()) {
-                // Cancel (20%)
                 op.type = OpType::Cancel;
                 std::uniform_int_distribution<std::size_t> idxDist(0, activeIds.size() - 1);
                 std::size_t idx = idxDist(rng_);
                 op.cancelId = activeIds[idx];
                 activeIds.erase(activeIds.begin() + static_cast<std::ptrdiff_t>(idx));
             } else {
-                // Add crossing (10%)
                 op.type = OpType::AddCross;
                 bool isBuy = (nextId % 2 == 0);
                 op.order = {
@@ -128,15 +116,7 @@ private:
     std::mt19937_64 rng_;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NO-OP CALLBACK (minimal overhead)
-// ─────────────────────────────────────────────────────────────────────────────
-
 inline void noOpCallback(const Trade&) {}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: ADD ONLY (Resting Orders)
-// ─────────────────────────────────────────────────────────────────────────────
 
 static void BM_AddOnly_Resting(benchmark::State& state) {
     const auto numOrders = static_cast<std::size_t>(state.range(0));
@@ -185,10 +165,6 @@ BENCHMARK(BM_AddOnly_Resting)
     ->Arg(10000)
     ->UseRealTime()
     ->Unit(benchmark::kMicrosecond);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: ONE-TO-ONE FULL FILLS (N resting sells, N/2 incoming buys)
-// ─────────────────────────────────────────────────────────────────────────────
 
 static void BM_MatchOneToOne(benchmark::State& state) {
     const auto numResting = static_cast<std::size_t>(state.range(0));
@@ -247,17 +223,12 @@ BENCHMARK(BM_MatchOneToOne)
     ->UseRealTime()
     ->Unit(benchmark::kMicrosecond);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: CANCEL ONLY
-// ─────────────────────────────────────────────────────────────────────────────
-
 static void BM_CancelOnly(benchmark::State& state) {
     const auto numOrders = static_cast<std::size_t>(state.range(0));
     
     InputGenerator gen;
     auto inputs = gen.generateRestingOrders(numOrders);
     
-    // Shuffle cancel order for realistic access pattern
     std::vector<uint64_t> cancelOrder(numOrders);
     std::iota(cancelOrder.begin(), cancelOrder.end(), 1);
     std::shuffle(cancelOrder.begin(), cancelOrder.end(), std::mt19937_64(123));
@@ -272,7 +243,6 @@ static void BM_CancelOnly(benchmark::State& state) {
         }
         state.ResumeTiming();
         
-        // Timed: cancel all orders
         for (uint64_t id : cancelOrder) {
             book.cancelOrder(id);
         }
@@ -290,10 +260,6 @@ BENCHMARK(BM_CancelOnly)
     ->Arg(1000)
     ->Arg(10000)
     ->Unit(benchmark::kMicrosecond);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: MIXED WORKLOAD (70% add-rest, 20% cancel, 10% add-cross)
-// ─────────────────────────────────────────────────────────────────────────────
 
 static void BM_MixedWorkload(benchmark::State& state) {
     const auto numOps = static_cast<std::size_t>(state.range(0));
@@ -335,10 +301,6 @@ BENCHMARK(BM_MixedWorkload)
     ->Arg(100000)
     ->Unit(benchmark::kMicrosecond);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: SINGLE ADD LATENCY (Microbenchmark)
-// ─────────────────────────────────────────────────────────────────────────────
-
 static void BM_SingleAdd_Empty(benchmark::State& state) {
     // Varying prices to prevent trivial branch prediction
     std::mt19937_64 rng(42);
@@ -356,11 +318,10 @@ static void BM_SingleAdd_Empty(benchmark::State& state) {
         
         book.addLimitOrder(side, price, qty, id, id % 100);
         
-        // Force materialization of side effects
         benchmark::DoNotOptimize(book.bestBid());
         benchmark::ClobberMemory();
         
-        // Cancel to keep book bounded (untimed but unavoidable)
+        // Timed: keeps the book bounded.
         book.cancelOrder(id);
     }
     
@@ -411,19 +372,11 @@ BENCHMARK(BM_SingleAdd_PopulatedBook)
     ->Arg(10000)
     ->Unit(benchmark::kNanosecond);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: SINGLE MATCH LATENCY
-// Fixed: Pre-build book, only time the matching operation
-// ─────────────────────────────────────────────────────────────────────────────
-
 static void BM_SingleMatch(benchmark::State& state) {
     const auto bookDepth = static_cast<std::size_t>(state.range(0));
     
-    // We need fresh resting orders each iteration
-    // Time: replenish + match cycle
     OrderBook book(bookDepth * 2 + 1000, noOpCallback);
     
-    // Pre-populate with sells at price 100
     for (std::size_t i = 0; i < bookDepth; ++i) {
         book.addLimitOrder(Side::Sell, 100, 1, i + 1, 1);
     }
@@ -432,13 +385,11 @@ static void BM_SingleMatch(benchmark::State& state) {
     uint64_t replenishId = bookDepth + 100000;
     
     for (auto _ : state) {
-        // Aggressive buy matches one resting sell
         book.addLimitOrder(Side::Buy, 100, 1, matchId++, 2);
         
         benchmark::DoNotOptimize(book.bestAsk());
         benchmark::ClobberMemory();
         
-        // Replenish the resting order (untimed but unavoidable for sustained benchmark)
         state.PauseTiming();
         book.addLimitOrder(Side::Sell, 100, 1, replenishId++, 1);
         state.ResumeTiming();
@@ -453,18 +404,12 @@ BENCHMARK(BM_SingleMatch)
     ->Arg(1000)
     ->Unit(benchmark::kNanosecond);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: PRICE LEVEL SWEEP (Match across multiple levels)
-// Fixed: Pre-build book, measure only the sweep, replenish after
-// ─────────────────────────────────────────────────────────────────────────────
-
 static void BM_MultiLevelSweep(benchmark::State& state) {
     const auto numLevels = static_cast<std::size_t>(state.range(0));
     const auto sweepQty = static_cast<uint32_t>(numLevels * 10);
     
     OrderBook book(numLevels * 20 + 1000, noOpCallback);
     
-    // Initial population: sells at different price levels
     uint64_t nextId = 1;
     for (std::size_t i = 0; i < numLevels; ++i) {
         book.addLimitOrder(Side::Sell, 100 + static_cast<uint32_t>(i), 10, nextId++, 1);
@@ -473,14 +418,12 @@ static void BM_MultiLevelSweep(benchmark::State& state) {
     uint64_t sweepId = 1000000;
     
     for (auto _ : state) {
-        // Time: aggressive buy sweeping all levels
         book.addLimitOrder(Side::Buy, 100 + static_cast<uint32_t>(numLevels), 
                           sweepQty, sweepId++, 2);
         
         benchmark::DoNotOptimize(book.bestAsk());
         benchmark::ClobberMemory();
         
-        // Replenish levels (untimed)
         state.PauseTiming();
         for (std::size_t i = 0; i < numLevels; ++i) {
             book.addLimitOrder(Side::Sell, 100 + static_cast<uint32_t>(i), 10, nextId++, 1);
@@ -499,12 +442,6 @@ BENCHMARK(BM_MultiLevelSweep)
     ->Arg(50)
     ->Arg(100)
     ->Unit(benchmark::kNanosecond);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: BEST BID/ASK ACCESS
-// Measures time to access bestBid/bestAsk interleaved with book modifications
-// This prevents the compiler from hoisting/eliminating the accesses
-// ─────────────────────────────────────────────────────────────────────────────
 
 static void BM_BestBidAskAccess(benchmark::State& state) {
     const auto bookDepth = static_cast<std::size_t>(state.range(0));
@@ -525,13 +462,11 @@ static void BM_BestBidAskAccess(benchmark::State& state) {
     std::uniform_int_distribution<uint32_t> priceDist(50, 80);
     
     for (auto _ : state) {
-        // Access best bid/ask
         auto* bid = book.bestBid();
         auto* ask = book.bestAsk();
         benchmark::DoNotOptimize(bid);
         benchmark::DoNotOptimize(ask);
         
-        // Modify the book (this prevents hoisting of the above)
         book.addLimitOrder(Side::Buy, priceDist(rng), 1, id, 1);
         book.cancelOrder(id);
         ++id;
@@ -547,11 +482,6 @@ BENCHMARK(BM_BestBidAskAccess)
     ->Arg(1000)
     ->Arg(10000)
     ->Unit(benchmark::kNanosecond);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BENCHMARK: THROUGHPUT (Orders per second)
-// Fixed: Randomize prices/sides to prevent trivial prediction
-// ─────────────────────────────────────────────────────────────────────────────
 
 static void BM_Throughput_AddCancel(benchmark::State& state) {
     std::mt19937_64 rng(42);

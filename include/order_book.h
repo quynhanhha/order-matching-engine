@@ -16,7 +16,6 @@ public:
     OrderBook(std::size_t capacity, TradeCallback callback)
         : pool_(capacity), onTrade_(std::move(callback))
     {
-        // Pre-allocate to avoid heap allocations on hot path
         orderIndex_.max_load_factor(0.7f);
         orderIndex_.reserve(capacity);
         bids_.reserve(detail::kDefaultMaxPriceLevels);
@@ -95,20 +94,19 @@ private:
     void matchBuy(Order* incoming) {
         if (asks_.empty()) return;
         
-        // Cache: avoid repeated .size()/.empty()/.back() calls
         auto* levels = asks_.data();
         auto numLevels = asks_.size();
-        auto* pl = levels + numLevels - 1;  // best ask (back)
+        auto* pl = levels + numLevels - 1;
         const auto incomingPrice = incoming->price;
         
         while (incoming->quantity > 0 && numLevels > 0) {
             if (incomingPrice < pl->price) { break; }
 
-            Order* resting = pl->head;  // inlined front()
+            Order* resting = pl->head;
 
             if (resting->participantId == incoming->participantId) {
                 incoming->quantity = 0;
-                break;  // defer cleanup to end
+                break;  // Self-match prevention cancels the incoming order.
             }
 
             const uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
@@ -125,34 +123,32 @@ private:
                 pool_.deallocate(resting);
             }
 
-            if (pl->head == nullptr) {  // inlined isEmpty()
+            if (pl->head == nullptr) {
                 --numLevels;
                 if (numLevels == 0) { break; }  // No preceding level to advance to.
                 --pl;
             }
         }
         
-        // Batch resize: single operation instead of repeated pop_back()
         asks_.resize(numLevels);
     }
 
     void matchSell(Order* incoming) {
         if (bids_.empty()) return;
         
-        // Cache: avoid repeated .size()/.empty()/.back() calls
         auto* levels = bids_.data();
         auto numLevels = bids_.size();
-        auto* pl = levels + numLevels - 1;  // best bid (back)
+        auto* pl = levels + numLevels - 1;
         const auto incomingPrice = incoming->price;
         
         while (incoming->quantity > 0 && numLevels > 0) {
             if (incomingPrice > pl->price) { break; }
 
-            Order* resting = pl->head;  // inlined front()
+            Order* resting = pl->head;
 
             if (resting->participantId == incoming->participantId) {
                 incoming->quantity = 0;
-                break;  // defer cleanup to end
+                break;  // Self-match prevention cancels the incoming order.
             }
 
             const uint32_t fillQty = std::min(incoming->quantity, resting->quantity);
@@ -169,14 +165,13 @@ private:
                 pool_.deallocate(resting);
             }
 
-            if (pl->head == nullptr) {  // inlined isEmpty()
+            if (pl->head == nullptr) {
                 --numLevels;
                 if (numLevels == 0) { break; }  // No preceding level to advance to.
                 --pl;
             }
         }
         
-        // Batch resize: single operation instead of repeated pop_back()
         bids_.resize(numLevels);
     }
 
