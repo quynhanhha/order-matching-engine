@@ -1,0 +1,19 @@
+{
+  "measurement_date_utc": "2026-10-09",
+  "recorded_base_commit": "3c3541a913269f44a10dc783d69078fb68541e62",
+  "measured_code_equivalent_commit": "a8edeb48184757bfab19abc042a66788a5deb5d5",
+  "identity_basis": "All 21 archived build, engine, benchmark, test, and runner files match this existing commit byte-for-byte; original documentation is excluded from the compact source archive.",
+  "source_archive": "measured-source.tar.gz",
+  "source_manifest": "source-sha256.txt",
+  "source_file_count": 21,
+  "executable_sha256": "ce8ce5ee5a094b7be31889a2b927909e56619a55be096269e55994d540cb17b6",
+  "google_benchmark": {
+    "tag": "v1.8.3",
+    "commit": "344117638c8ff7e239044fd0fa7085839fc03021"
+  },
+  "google_test": {
+    "tag": "v1.14.0",
+    "commit": "f8d7d77c06936315286eb55f8de22cd23c188571"
+  },
+  "artifacts": "Original raw results and environment records are copied unchanged. Test logs are renamed .txt. The original executable and generated build trees are not included."
+}

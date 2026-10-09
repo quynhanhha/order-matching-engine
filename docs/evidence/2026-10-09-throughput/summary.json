@@ -1,0 +1,77 @@
+{
+  "methodology": "repaired",
+  "benchmarks": {
+    "BM_AddOnly_Resting/100/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 31293493.581392072,
+      "min_orders_per_second": 30188089.963598568,
+      "max_orders_per_second": 31858734.68051783,
+      "sample_cv_percent": 1.691375443593721,
+      "session_median_orders_per_second": [
+        31221117.079101276,
+        31451937.108164955
+      ],
+      "session_median_difference_percent": 0.7365845882474219
+    },
+    "BM_AddOnly_Resting/1000/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 39860285.65522743,
+      "min_orders_per_second": 38723035.147171736,
+      "max_orders_per_second": 40223812.59965169,
+      "sample_cv_percent": 1.2843314026560786,
+      "session_median_orders_per_second": [
+        39462441.642670825,
+        39921068.824420504
+      ],
+      "session_median_difference_percent": 1.1554721605308813
+    },
+    "BM_AddOnly_Resting/10000/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 41478183.31952887,
+      "min_orders_per_second": 39871116.596806936,
+      "max_orders_per_second": 42161875.45057397,
+      "sample_cv_percent": 1.7763732775491239,
+      "session_median_orders_per_second": [
+        41489813.75101616,
+        41466552.88804158
+      ],
+      "session_median_difference_percent": 0.05607975353065273
+    },
+    "BM_MatchOneToOne/100/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 27217189.482526775,
+      "min_orders_per_second": 26545371.80518561,
+      "max_orders_per_second": 27718475.655700598,
+      "sample_cv_percent": 1.5342209936666042,
+      "session_median_orders_per_second": [
+        27019226.864084512,
+        27539749.492244564
+      ],
+      "session_median_difference_percent": 1.9081099497192788
+    },
+    "BM_MatchOneToOne/1000/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 49037865.575661376,
+      "min_orders_per_second": 47790368.11083013,
+      "max_orders_per_second": 49690420.31416206,
+      "sample_cv_percent": 1.141289497176841,
+      "session_median_orders_per_second": [
+        48978579.61344381,
+        49242506.33497799
+      ],
+      "session_median_difference_percent": 0.5374135685544736
+    },
+    "BM_MatchOneToOne/10000/real_time": {
+      "repetitions": 10,
+      "median_orders_per_second": 53244946.051215746,
+      "min_orders_per_second": 51132715.90255064,
+      "max_orders_per_second": 54254127.24000093,
+      "sample_cv_percent": 1.8393244026527467,
+      "session_median_orders_per_second": [
+        52802099.70028919,
+        53654054.5214444
+      ],
+      "session_median_difference_percent": 1.6005741093759736
+    }
+  }
+}

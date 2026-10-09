@@ -1,0 +1,4 @@
+method=repaired
+filter=^(BM_AddOnly_Resting|BM_MatchOneToOne)/[0-9]+/real_time$
+sessions=2 repetitions=5 minimum_measurement_seconds=1 warmup_seconds=1
+callback=no-op; random_interleaving=true; affinity/frequency not controlled

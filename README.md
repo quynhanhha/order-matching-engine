@@ -1,315 +1,110 @@
-# **Order Matching Engine**
+# Order Matching Engine
 
-A high-performance limit order book (LOB) and matching engine implemented in modern C++.
+A C++20 limit order book and matching engine with price–time priority, partial and full fills, cancellation, and self-match prevention. The project focuses on explicit memory management and measurable API behavior.
 
-This project demonstrates systems-level thinking, low-latency architecture, and memory-safe, allocation-free data structures inspired by real-world electronic trading engines.
+## Features and matching behavior
 
----
+- Limit orders rest on the book or match immediately when they cross the spread.
+- Buys match the lowest ask; sells match the highest bid. Trades execute at the resting order's price, with FIFO priority within a price level.
+- Unfilled incoming quantity rests, except when self-match prevention encounters the same participant at the head of the opposing queue: the incoming remainder is cancelled.
+- A synchronous, templated callback receives each trade's buy order ID, sell order ID, price, and quantity.
+- Best bid/ask access returns the best price level in constant time.
 
-## **Overview**
+The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply unique order IDs, positive quantities, and sufficient pool capacity.
 
-The engine maintains a central limit order book with strict **price–time priority**, supports adding and cancelling orders, and performs matching between aggressive and resting orders.
+## Architecture and memory management
 
-It is designed to be:
+| Component | Design and behavior |
+|---|---|
+| `Order` | Side, integer price/quantity, order and participant IDs, sequence number, and intrusive next/previous links |
+| `OrderPool` | Fixed-capacity contiguous storage with a free list for order reuse |
+| `PriceLevel` | Aggregate quantity and an intrusive FIFO queue of orders |
+| `OrderBook<TradeCallback>` | Sorted price-level vectors, a reserved order-ID hash index, and a templated trade callback |
 
-* **Deterministic**
+Bids are stored ascending and asks descending, with the best price at each vector's back. Price lookup uses `lower_bound`; inserting or erasing levels can shift vector elements. Order-ID lookup is average O(1), but a full cancellation also looks up a price level and may erase it, so cancellation is not universally O(1).
 
-* **Cache-efficient**
+The pool and price-level vector capacity are allocated during construction; the ID index reserves buckets up front. **Resting additions still allocate hash-map nodes.** Fully filled incoming orders use pool storage and do not insert an incoming index node, but matching can deallocate filled resting orders' hash nodes. A resting remainder can allocate an index node, and callbacks can allocate independently. Execution is therefore not universally allocation-free.
 
-* **Allocation-free in the hot path**
+FIFO links, positive resting quantities, aggregate quantities, sorted levels, index cleanup, and empty-book transitions are covered by tests. Debug builds also enable assertions and sanitizers. Best-price pointers are borrowed and should not be retained across book mutations that can invalidate vector elements.
 
-* **Benchmarkable and debuggable**
-
-The implementation uses intrusive linked lists, preallocated memory pools, sorted price levels, and a predictable control-flow path suitable for low-latency workloads.
-
----
-
-## **Features**
-
-### **Core Functionality**
-
-* Add limit orders
-* Cancel resting orders
-* Automatic matching when incoming orders cross the spread
-* Partial and full fills
-* Self-match prevention (SMP) via participant ID
-* Trade event generation via callback interface
-
-### **Data Structure Highlights**
-
-* Preallocated fixed-size `OrderPool`
-* No dynamic allocations during matching
-* Price levels stored in sorted vectors
-* Intrusive FIFO queues for price-time priority
-* O(1) cancel via order ID index
-* Deterministic sequence-based ordering
-
-### **Performance-Oriented Design**
-
-* Hot code paths free of heap allocation
-* Compact `Order` layout for cache locality
-* `lower_bound` search for price-level lookup
-* Google Benchmark for throughput measurement
-* Custom latency harness for percentile distribution
-
----
-
-## **Performance**
-
-Measured on Apple M3 Pro (Release build, `-O3 -DNDEBUG -march=native`):
-
-| Operation | Latency (p50) | Throughput |
-|-----------|---------------|------------|
-| Add Resting Order | 50 ns | 20-22 M/s |
-| Add Crossing Order | 60 ns | 16-18 M/s |
-| Cancel Order | 67 ns | 16-23 M/s |
-| 10-Level Sweep | 250 ns | ~4 M/s |
-| Best Bid/Ask | ~2-3 ns | O(1) |
-
-**Key properties:**
-- Crossing orders that fully fill allocate **0 heap memory**
-- Resting orders allocate 1 `unordered_map` node
-- Tight tail latencies: p99 typically < 2x p50
-
-See [docs/perf-notes.md](docs/perf-notes.md) for full methodology, percentiles, and reproducibility notes.
-
----
-
-## **Architecture**
-
-### **Order Representation**
-
-Each order is represented as an intrusive node in a doubly-linked list:
+## API example
 
 ```cpp
-struct Order {
-    uint64_t orderId;
-    uint32_t price;
-    uint32_t quantity;
-    uint64_t sequence;
-    Side side;
-    uint64_t participantId;
-    Order* next;
-    Order* prev;
-};
+#include <iostream>
+#include <algorithm>
+#include "order_book.h"
+
+int main() {
+    OrderBook book(10000, [](const Trade& trade) -> void {
+        std::cout << trade.buyOrderId << " buys from " << trade.sellOrderId
+                  << ": " << trade.quantity << " @ " << trade.price << '\n';
+    });
+
+    book.addLimitOrder(Side::Sell, 100, 10, 1, 101);
+    book.addLimitOrder(Side::Buy, 100, 4, 2, 202); // Partial fill; six remain on the ask.
+    book.cancelOrder(1);
+    return 0;
+}
 ```
 
-### **Price Levels**
+The public API also provides `bestBid()` and `bestAsk()`, returning `const PriceLevel*` or `nullptr`. Cancelling an absent ID is a no-op. See [the book implementation](include/order_book.h), [trade types](include/types.h), and [matching tests](tests/order_book_matching_tests.cpp).
 
-A price level maintains a FIFO queue of orders:
+## Build and test
 
-```cpp
-struct PriceLevel {
-    uint32_t price;
-    uint32_t totalQuantity;
-    Order* head;
-    Order* tail;
-    void addToTail(Order* o);
-    void remove(Order* o);
-};
-```
+The published benchmark environment is macOS on Apple Silicon with Apple Clang 21. Build prerequisites are a C++20 compiler, CMake 3.16 or newer, Git, and the platform toolchain. The throughput workflow additionally uses Bash and Python 3.9 or newer (standard library only). Clang/GNU build flags are configured; other platforms and compilers have not been validated for the published rates.
 
-### **Order Pool**
-
-A fixed-size contiguous pool ensures predictable memory behavior:
-
-```cpp
-OrderPool pool(maxOrders);
-// allocate() and deallocate() operate via a free list
-```
-
-### **Order Book**
-
-The `OrderBook` is a template class that maintains:
-
-* sorted vectors of bid and ask price levels
-* `unordered_map` index for O(1) order lookup (pre-reserved)
-* sequence counter for price-time priority
-* a trade callback interface (templated to avoid `std::function` overhead)
-
----
-
-## **API Summary**
-
-```cpp
-template<typename TradeCallback>
-class OrderBook {
-public:
-    OrderBook(std::size_t capacity, TradeCallback callback);
-    
-    void addLimitOrder(Side side, uint32_t price, uint32_t quantity, 
-                       uint64_t orderId, uint64_t participantId);
-    void cancelOrder(uint64_t orderId);
-    
-    const PriceLevel* bestBid() const;
-    const PriceLevel* bestAsk() const;
-};
-```
-
-Trade event callback:
-
-```cpp
-struct Trade {
-    uint64_t incomingOrderId;
-    uint64_t restingOrderId;
-    uint32_t price;
-    uint32_t quantity;
-};
-
-// Example usage:
-OrderBook book(10000, [](const Trade& t) {
-    std::cout << "Trade: " << t.quantity << " @ " << t.price << "\n";
-});
-```
-
----
-
-## **Matching Logic**
-
-### **BUY incoming**
-
-Matches against lowest ask levels:
-
-```
-while incoming.price >= bestAsk.price and qty > 0:
-    if incoming.participantId == resting.participantId:
-        cancel incoming (self-match prevention)
-    fill against head of bestAsk FIFO
-```
-
-### **SELL incoming**
-
-Matches against highest bid levels:
-
-```
-while incoming.price <= bestBid.price and qty > 0:
-    if incoming.participantId == resting.participantId:
-        cancel incoming (self-match prevention)
-    fill against head of bestBid FIFO
-```
-
-Unfilled quantity becomes a resting order.
-
----
-
-## **Invariants**
-
-The engine maintains strict invariants:
-
-### **Order Invariants**
-
-* FIFO order preserved via `sequence`
-* Linked lists contain no cycles
-* `quantity > 0` for all resting orders
-
-### **Price Level Invariants**
-
-* Sorted: bids ascending, asks descending (best at back)
-* `totalQuantity` matches the sum of quantities in the list
-* No empty levels remain stored
-
-### **Order Book Invariants**
-
-* `orderIndex[id]` is correct or absent
-* `bestBid()` and `bestAsk()` return pointer to back of sorted vectors
-* Only resting orders (quantity > 0) are indexed
-
-These invariants are verified in tests and debug builds.
-
----
-
-## **Project Structure**
-
-```
-.
-├── include/
-│   ├── order_book.h        # Header-only OrderBook template
-│   ├── order_pool.h
-│   ├── price_level.h
-│   └── types.h
-├── src/
-│   ├── order_pool.cpp
-│   ├── price_level.cpp
-│   └── main.cpp
-├── tests/
-│   ├── order_book_matching_tests.cpp
-│   ├── order_book_cancel_test.cpp
-│   ├── order_book_smp_tests.cpp
-│   └── allocation_test.cpp
-├── benchmarks/
-│   ├── order_book_bench.cpp      # Google Benchmark suite
-│   └── latency_percentiles.cpp   # Custom latency harness
-├── docs/
-│   └── perf-notes.md
-└── CMakeLists.txt
-```
-
----
-
-## **Benchmarking**
-
-### **Throughput (Google Benchmark)**
+A Debug build enables AddressSanitizer and UndefinedBehaviorSanitizer with Clang/GNU:
 
 ```bash
-./build-release/order_book_bench
+cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug \
+  -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=OFF
+cmake --build build-debug --parallel 2
+ASAN_OPTIONS=halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
+  ctest --test-dir build-debug --output-on-failure
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover \
+  -s tests -p test_throughput_summary.py
 ```
 
-Measures ops/sec for add, cancel, match, and mixed workloads.
+CMake fetches Google Test **v1.14.0** for tests and Google Benchmark **v1.8.3** when benchmarks are enabled. Initial dependency acquisition requires network access. The benchmark reproduction helper below prepares pinned checkouts explicitly and then uses disconnected builds.
 
-### **Latency Percentiles (Custom Harness)**
+## Performance
+
+Measured on Apple M3 Pro with 36 GiB memory, macOS 26.5.2, Apple Clang 21, C++20, and Release flags including `-O3 -DNDEBUG -march=native -flto`:
+
+| Synthetic workload | Median rate | Range across ten measurements |
+|---|---:|---:|
+| 10,000 non-crossing additions into an empty book | **41.478M resting additions/sec** | 39.871–42.162M/sec |
+| 5,000 one-to-one full fills against 10,000 quantity-one sells at one price | **53.245M incoming full fills/sec** | 51.133–54.254M/sec |
+
+These are single-threaded, amortized batch API rates with an empty trade callback, measured in two consecutive process runs with five repetitions each. Setup and teardown are excluded; allocation/deallocation inside API calls remains included. The matching workload is a favorable case with no price-level removal, partial fills, or SMP events. These results do not establish production exchange capacity or individual-order latency percentiles.
+
+The [current performance report](docs/throughput-report.md) is the authoritative methodology and results document. The [repository evidence bundle](docs/evidence/2026-10-09-throughput/README.md) contains raw results, source identity, compiler/environment records, and test evidence.
+
+## Reproduce throughput from a fresh clone
+
+From the repository root on the supported macOS/Apple Clang environment:
 
 ```bash
-./build-release/latency_percentiles
+bash docs/evidence/2026-10-09-throughput/reproduce.sh
 ```
 
-Measures p50/p90/p99/p99.9 for individual operations using `mach_absolute_time()` (macOS) with batching to overcome timer resolution.
+This prepares clean, pinned Google Benchmark v1.8.3 and Google Test v1.14.0 checkouts in `.cache/throughput-deps/`, then invokes the existing runner. It runs correctness checks before building Release and recording both measurement sessions. New output is written to `benchmark_results/<UTC timestamp>-repaired/`; existing results are never overwritten.
 
-### **Building Benchmarks**
+To inspect the published evidence without running benchmarks:
 
 ```bash
-cmake -B build-release -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
-cmake --build build-release
+PYTHONDONTWRITEBYTECODE=1 python3 \
+  docs/evidence/2026-10-09-throughput/verify_evidence.py
 ```
 
----
+See the [report's reproduction instructions](docs/throughput-report.md#reproduction) for explicit dependency commands, rebuilding the exact measured source, compiler flags, and limitations. Other registered benchmarks and the latency harness remain diagnostic; their outputs are not part of the current performance claims.
 
-## **Building & Running**
+## Repository layout
 
-### **Build (Debug)**
+- `include/`, `src/`: engine and core data structures.
+- `tests/`: matching, FIFO/price priority, SMP, cancellation, allocation, pool, and workload checks.
+- `benchmarks/`: Google Benchmark suite, shared throughput inputs/validation, and latency harness.
+- `scripts/`: throughput runner and result accounting/summary checks.
+- `docs/`: current performance report and compact published evidence.
 
-```bash
-cmake -B build
-cmake --build build
-```
-
-### **Build (Release with Benchmarks)**
-
-```bash
-cmake -B build-release -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
-cmake --build build-release
-```
-
-### **Run Tests**
-
-```bash
-cd build && ctest --output-on-failure
-```
-
-### **Run Benchmarks**
-
-```bash
-./build-release/order_book_bench
-./build-release/latency_percentiles
-```
-
----
-
-## **Future Improvements**
-
-* Lock-free or wait-free matching engine variant
-* NUMA-aware memory placement
-* Market/IOC/FOK order types
-* Instrumentation hooks (ETW, LTTng)
-* FPGA or DPDK-style order ingestion layer
-* Multi-symbol support
-* `perf stat` measurements on Linux (cycles, IPC, cache misses)
+[MIT License](LICENSE).

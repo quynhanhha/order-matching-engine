@@ -1,0 +1,167 @@
+Test project /Users/quynhanhha/projects/c++/order-matching-engine/benchmark_results/20261009T035923Z-repaired/build-sanitizers
+      Start  1: OrderPoolDeathTest.AllocateWhenEmptyAsserts
+ 1/81 Test  #1: OrderPoolDeathTest.AllocateWhenEmptyAsserts ..................................   Passed    0.10 sec
+      Start  2: OrderPoolDeathTest.DeallocateNullptrAsserts
+ 2/81 Test  #2: OrderPoolDeathTest.DeallocateNullptrAsserts ..................................   Passed    0.10 sec
+      Start  3: OrderPoolDeathTest.DeallocateWhenFullAsserts
+ 3/81 Test  #3: OrderPoolDeathTest.DeallocateWhenFullAsserts .................................   Passed    0.10 sec
+      Start  4: OrderPoolDeathTest.DoubleDeallocateAsserts
+ 4/81 Test  #4: OrderPoolDeathTest.DoubleDeallocateAsserts ...................................   Passed    0.10 sec
+      Start  5: OrderPoolTest.ConstructorInitializesCorrectly
+ 5/81 Test  #5: OrderPoolTest.ConstructorInitializesCorrectly ................................   Passed    0.07 sec
+      Start  6: OrderPoolTest.AllocatesUpToCapacity
+ 6/81 Test  #6: OrderPoolTest.AllocatesUpToCapacity ..........................................   Passed    0.06 sec
+      Start  7: OrderPoolTest.AllocateReturnsUniquePointers
+ 7/81 Test  #7: OrderPoolTest.AllocateReturnsUniquePointers ..................................   Passed    0.06 sec
+      Start  8: OrderPoolTest.AllocatedOrderHasNullPrevNext
+ 8/81 Test  #8: OrderPoolTest.AllocatedOrderHasNullPrevNext ..................................   Passed    0.06 sec
+      Start  9: OrderPoolTest.DeallocateIncreasesFreeCount
+ 9/81 Test  #9: OrderPoolTest.DeallocateIncreasesFreeCount ...................................   Passed    0.06 sec
+      Start 10: OrderPoolTest.ReusesDeallocatedOrders
+10/81 Test #10: OrderPoolTest.ReusesDeallocatedOrders ........................................   Passed    0.06 sec
+      Start 11: OrderPoolTest.DeallocateAllocateIsLIFO
+11/81 Test #11: OrderPoolTest.DeallocateAllocateIsLIFO .......................................   Passed    0.06 sec
+      Start 12: OrderPoolTest.FullCycle
+12/81 Test #12: OrderPoolTest.FullCycle ......................................................   Passed    0.06 sec
+      Start 13: PriceLevelTest.StartsEmpty
+13/81 Test #13: PriceLevelTest.StartsEmpty ...................................................   Passed    0.06 sec
+      Start 14: PriceLevelTest.AddSingleOrder
+14/81 Test #14: PriceLevelTest.AddSingleOrder ................................................   Passed    0.07 sec
+      Start 15: PriceLevelTest.FIFOOrdering
+15/81 Test #15: PriceLevelTest.FIFOOrdering ..................................................   Passed    0.07 sec
+      Start 16: PriceLevelTest.RemoveHead
+16/81 Test #16: PriceLevelTest.RemoveHead ....................................................   Passed    0.07 sec
+      Start 17: PriceLevelTest.RemoveTail
+17/81 Test #17: PriceLevelTest.RemoveTail ....................................................   Passed    0.06 sec
+      Start 18: PriceLevelTest.RemoveMiddle
+18/81 Test #18: PriceLevelTest.RemoveMiddle ..................................................   Passed    0.06 sec
+      Start 19: PriceLevelTest.RemoveOnlyOrderMakesLevelEmpty
+19/81 Test #19: PriceLevelTest.RemoveOnlyOrderMakesLevelEmpty ................................   Passed    0.06 sec
+      Start 20: PriceLevelTest.FrontReturnsHead
+20/81 Test #20: PriceLevelTest.FrontReturnsHead ..............................................   Passed    0.06 sec
+      Start 21: PriceLevelTest.FrontReturnsNullWhenEmpty
+21/81 Test #21: PriceLevelTest.FrontReturnsNullWhenEmpty .....................................   Passed    0.06 sec
+      Start 22: OrderBookMatchingTest.BuyOrderRestsWhenNoAsks
+22/81 Test #22: OrderBookMatchingTest.BuyOrderRestsWhenNoAsks ................................   Passed    0.06 sec
+      Start 23: OrderBookMatchingTest.SellOrderRestsWhenNoBids
+23/81 Test #23: OrderBookMatchingTest.SellOrderRestsWhenNoBids ...............................   Passed    0.06 sec
+      Start 24: OrderBookMatchingTest.BuyOrderRestsWhenPriceBelowBestAsk
+24/81 Test #24: OrderBookMatchingTest.BuyOrderRestsWhenPriceBelowBestAsk .....................   Passed    0.06 sec
+      Start 25: OrderBookMatchingTest.SellOrderRestsWhenPriceAboveBestBid
+25/81 Test #25: OrderBookMatchingTest.SellOrderRestsWhenPriceAboveBestBid ....................   Passed    0.06 sec
+      Start 26: OrderBookMatchingTest.BuyExactlyFillsSell
+26/81 Test #26: OrderBookMatchingTest.BuyExactlyFillsSell ....................................   Passed    0.06 sec
+      Start 27: OrderBookMatchingTest.SellExactlyFillsBuy
+27/81 Test #27: OrderBookMatchingTest.SellExactlyFillsBuy ....................................   Passed    0.06 sec
+      Start 28: OrderBookMatchingTest.BuyPartiallyFillsRemainderRests
+28/81 Test #28: OrderBookMatchingTest.BuyPartiallyFillsRemainderRests ........................   Passed    0.06 sec
+      Start 29: OrderBookMatchingTest.SellPartiallyFillsRemainderRests
+29/81 Test #29: OrderBookMatchingTest.SellPartiallyFillsRemainderRests .......................   Passed    0.06 sec
+      Start 30: OrderBookMatchingTest.BuyPartiallyFillsRestingRemains
+30/81 Test #30: OrderBookMatchingTest.BuyPartiallyFillsRestingRemains ........................   Passed    0.06 sec
+      Start 31: OrderBookMatchingTest.SellPartiallyFillsRestingRemains
+31/81 Test #31: OrderBookMatchingTest.SellPartiallyFillsRestingRemains .......................   Passed    0.06 sec
+      Start 32: OrderBookMatchingTest.BuySweepsMultipleOrdersSamePriceFIFO
+32/81 Test #32: OrderBookMatchingTest.BuySweepsMultipleOrdersSamePriceFIFO ...................   Passed    0.06 sec
+      Start 33: OrderBookMatchingTest.SellSweepsMultipleOrdersSamePriceFIFO
+33/81 Test #33: OrderBookMatchingTest.SellSweepsMultipleOrdersSamePriceFIFO ..................   Passed    0.06 sec
+      Start 34: OrderBookMatchingTest.BuySweepsMultiplePriceLevelsBestFirst
+34/81 Test #34: OrderBookMatchingTest.BuySweepsMultiplePriceLevelsBestFirst ..................   Passed    0.06 sec
+      Start 35: OrderBookMatchingTest.SellSweepsMultiplePriceLevelsBestFirst
+35/81 Test #35: OrderBookMatchingTest.SellSweepsMultiplePriceLevelsBestFirst .................   Passed    0.06 sec
+      Start 36: OrderBookMatchingTest.BuyWithPriceImprovementMatchesAtAskPrice
+36/81 Test #36: OrderBookMatchingTest.BuyWithPriceImprovementMatchesAtAskPrice ...............   Passed    0.06 sec
+      Start 37: OrderBookMatchingTest.SellWithPriceImprovementMatchesAtBidPrice
+37/81 Test #37: OrderBookMatchingTest.SellWithPriceImprovementMatchesAtBidPrice ..............   Passed    0.06 sec
+      Start 38: OrderBookMatchingTest.PriceLevelRemovedWhenAllOrdersFilled
+38/81 Test #38: OrderBookMatchingTest.PriceLevelRemovedWhenAllOrdersFilled ...................   Passed    0.06 sec
+      Start 39: OrderBookMatchingTest.BuyExhaustsFinalAskAndMatchesAgainAfterEmptyBook
+39/81 Test #39: OrderBookMatchingTest.BuyExhaustsFinalAskAndMatchesAgainAfterEmptyBook .......   Passed    0.06 sec
+      Start 40: OrderBookMatchingTest.SellExhaustsFinalBidAndMatchesAgainAfterEmptyBook
+40/81 Test #40: OrderBookMatchingTest.SellExhaustsFinalBidAndMatchesAgainAfterEmptyBook ......   Passed    0.06 sec
+      Start 41: OrderBookMatchingTest.BuyExhaustsAllAskLevelsAndRemainderMatchesAgain
+41/81 Test #41: OrderBookMatchingTest.BuyExhaustsAllAskLevelsAndRemainderMatchesAgain ........   Passed    0.06 sec
+      Start 42: OrderBookMatchingTest.SellExhaustsAllBidLevelsAndRemainderMatchesAgain
+42/81 Test #42: OrderBookMatchingTest.SellExhaustsAllBidLevelsAndRemainderMatchesAgain .......   Passed    0.06 sec
+      Start 43: OrderBookMatchingTest.MultiplePriceLevelsOrdered
+43/81 Test #43: OrderBookMatchingTest.MultiplePriceLevelsOrdered .............................   Passed    0.06 sec
+      Start 44: SelfMatchPreventionTest.BuyCancelsIncoming
+44/81 Test #44: SelfMatchPreventionTest.BuyCancelsIncoming ...................................   Passed    0.06 sec
+      Start 45: SelfMatchPreventionTest.SellCancelsIncoming
+45/81 Test #45: SelfMatchPreventionTest.SellCancelsIncoming ..................................   Passed    0.06 sec
+      Start 46: SelfMatchPreventionTest.DifferentParticipantsCanTrade
+46/81 Test #46: SelfMatchPreventionTest.DifferentParticipantsCanTrade ........................   Passed    0.06 sec
+      Start 47: SelfMatchPreventionTest.CancelsIncomingWhenOwnOrderAtFront
+47/81 Test #47: SelfMatchPreventionTest.CancelsIncomingWhenOwnOrderAtFront ...................   Passed    0.06 sec
+      Start 48: SelfMatchPreventionTest.BuyAggressivePriceCrossing
+48/81 Test #48: SelfMatchPreventionTest.BuyAggressivePriceCrossing ...........................   Passed    0.06 sec
+      Start 49: SelfMatchPreventionTest.SellAggressivePriceCrossing
+49/81 Test #49: SelfMatchPreventionTest.SellAggressivePriceCrossing ..........................   Passed    0.06 sec
+      Start 50: SelfMatchPreventionTest.PartialFillThenSelfMatchCrossLevel
+50/81 Test #50: SelfMatchPreventionTest.PartialFillThenSelfMatchCrossLevel ...................   Passed    0.06 sec
+      Start 51: SelfMatchPreventionTest.MultiLevelBookBuySide
+51/81 Test #51: SelfMatchPreventionTest.MultiLevelBookBuySide ................................   Passed    0.06 sec
+      Start 52: SelfMatchPreventionTest.MultiLevelBookSellSide
+52/81 Test #52: SelfMatchPreventionTest.MultiLevelBookSellSide ...............................   Passed    0.06 sec
+      Start 53: SelfMatchPreventionTest.MidLoopBuySide
+53/81 Test #53: SelfMatchPreventionTest.MidLoopBuySide .......................................   Passed    0.06 sec
+      Start 54: SelfMatchPreventionTest.MidLoopSellSide
+54/81 Test #54: SelfMatchPreventionTest.MidLoopSellSide ......................................   Passed    0.06 sec
+      Start 55: OrderBookCancelTest.CancelNonExistentOrderIsNoOp
+55/81 Test #55: OrderBookCancelTest.CancelNonExistentOrderIsNoOp .............................   Passed    0.06 sec
+      Start 56: OrderBookCancelTest.CancelAlreadyCancelledOrderIsNoOp
+56/81 Test #56: OrderBookCancelTest.CancelAlreadyCancelledOrderIsNoOp ........................   Passed    0.05 sec
+      Start 57: OrderBookCancelTest.CancelHeadBidLeavesRemainingOrders
+57/81 Test #57: OrderBookCancelTest.CancelHeadBidLeavesRemainingOrders .......................   Passed    0.06 sec
+      Start 58: OrderBookCancelTest.CancelHeadAskLeavesRemainingOrders
+58/81 Test #58: OrderBookCancelTest.CancelHeadAskLeavesRemainingOrders .......................   Passed    0.06 sec
+      Start 59: OrderBookCancelTest.CancelMiddleBidLeavesHeadAndTail
+59/81 Test #59: OrderBookCancelTest.CancelMiddleBidLeavesHeadAndTail .........................   Passed    0.05 sec
+      Start 60: OrderBookCancelTest.CancelMiddleAskLeavesHeadAndTail
+60/81 Test #60: OrderBookCancelTest.CancelMiddleAskLeavesHeadAndTail .........................   Passed    0.06 sec
+      Start 61: OrderBookCancelTest.CancelTailBidLeavesHeadAndMiddle
+61/81 Test #61: OrderBookCancelTest.CancelTailBidLeavesHeadAndMiddle .........................   Passed    0.06 sec
+      Start 62: OrderBookCancelTest.CancelTailAskLeavesHeadAndMiddle
+62/81 Test #62: OrderBookCancelTest.CancelTailAskLeavesHeadAndMiddle .........................   Passed    0.05 sec
+      Start 63: OrderBookCancelTest.CancelOnlyBidRemovesPriceLevel
+63/81 Test #63: OrderBookCancelTest.CancelOnlyBidRemovesPriceLevel ...........................   Passed    0.05 sec
+      Start 64: OrderBookCancelTest.CancelOnlyAskRemovesPriceLevel
+64/81 Test #64: OrderBookCancelTest.CancelOnlyAskRemovesPriceLevel ...........................   Passed    0.06 sec
+      Start 65: OrderBookCancelTest.CancelBestBidUpdatesToNextLevel
+65/81 Test #65: OrderBookCancelTest.CancelBestBidUpdatesToNextLevel ..........................   Passed    0.05 sec
+      Start 66: OrderBookCancelTest.CancelBestAskUpdatesToNextLevel
+66/81 Test #66: OrderBookCancelTest.CancelBestAskUpdatesToNextLevel ..........................   Passed    0.05 sec
+      Start 67: OrderBookCancelTest.CancelNonBestLevelDoesNotAffectBest
+67/81 Test #67: OrderBookCancelTest.CancelNonBestLevelDoesNotAffectBest ......................   Passed    0.05 sec
+      Start 68: AllocationTest.AddLimitOrderAllocatesOnlyForIndex
+68/81 Test #68: AllocationTest.AddLimitOrderAllocatesOnlyForIndex ............................   Passed    0.05 sec
+      Start 69: AllocationTest.MatchingNoAllocation
+69/81 Test #69: AllocationTest.MatchingNoAllocation ..........................................   Passed    0.05 sec
+      Start 70: AllocationTest.CancelOrderNoAllocation
+70/81 Test #70: AllocationTest.CancelOrderNoAllocation .......................................   Passed    0.05 sec
+      Start 71: AllocationTest.MixedOperationsOnlyIndexAllocates
+71/81 Test #71: AllocationTest.MixedOperationsOnlyIndexAllocates .............................   Passed    0.05 sec
+      Start 72: AllocationTest.FullCycleOnlyIndexAllocates
+72/81 Test #72: AllocationTest.FullCycleOnlyIndexAllocates ...................................   Passed    0.05 sec
+      Start 73: ThroughputWorkloadTest.RestingTracePreservesAllOrdersWithoutTrades
+73/81 Test #73: ThroughputWorkloadTest.RestingTracePreservesAllOrdersWithoutTrades ...........   Passed    0.09 sec
+      Start 74: ThroughputWorkloadTest.MatchingTraceFullyFillsEachIncomingOrderInFIFOOrder
+74/81 Test #74: ThroughputWorkloadTest.MatchingTraceFullyFillsEachIncomingOrderInFIFOOrder ...   Passed    0.07 sec
+      Start 75: ThroughputWorkloadTest.RestingValidationRejectsAccidentalCrossing
+75/81 Test #75: ThroughputWorkloadTest.RestingValidationRejectsAccidentalCrossing ............   Passed    0.05 sec
+      Start 76: ThroughputWorkloadTest.RestingValidationRejectsSilentSMPCancellation
+76/81 Test #76: ThroughputWorkloadTest.RestingValidationRejectsSilentSMPCancellation .........   Passed    0.05 sec
+      Start 77: ThroughputWorkloadTest.MatchingValidationRejectsSameParticipant
+77/81 Test #77: ThroughputWorkloadTest.MatchingValidationRejectsSameParticipant ..............   Passed    0.05 sec
+      Start 78: ThroughputWorkloadTest.MatchingValidationRejectsPartialFillInput
+78/81 Test #78: ThroughputWorkloadTest.MatchingValidationRejectsPartialFillInput .............   Passed    0.05 sec
+      Start 79: ThroughputWorkloadTest.MatchingValidationRejectsNonCrossingInput
+79/81 Test #79: ThroughputWorkloadTest.MatchingValidationRejectsNonCrossingInput .............   Passed    0.05 sec
+      Start 80: ThroughputWorkloadTest.MatchingValidationRejectsDuplicateIDsBeforeReplay
+80/81 Test #80: ThroughputWorkloadTest.MatchingValidationRejectsDuplicateIDsBeforeReplay .....   Passed    0.05 sec
+      Start 81: ThroughputWorkloadTest.MatchingValidationRejectsIncorrectBatchCount
+81/81 Test #81: ThroughputWorkloadTest.MatchingValidationRejectsIncorrectBatchCount ..........   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 81
+
+Total Test time (real) =   4.86 sec

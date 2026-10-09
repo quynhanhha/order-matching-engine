@@ -1,0 +1,218 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7303777..b908b62 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -119,6 +119,10 @@ if(BUILD_TESTS)
+             order_matching_engine
+             GTest::gtest_main
+     )
++
++    # Untimed validation of the published throughput workloads
++    add_executable(throughput_workload_test tests/throughput_workload_test.cpp)
++    target_link_libraries(throughput_workload_test PRIVATE order_matching_engine GTest::gtest_main)
+     
+     include(GoogleTest)
+     gtest_discover_tests(order_pool_test)
+@@ -127,6 +131,7 @@ if(BUILD_TESTS)
+     gtest_discover_tests(order_book_smp_test)
+     gtest_discover_tests(order_book_cancel_test)
+     gtest_discover_tests(allocation_test)
++    gtest_discover_tests(throughput_workload_test)
+     
+     # TODO: uncomment when implemented
+     # add_executable(order_book_test tests/order_book_test.cpp)
+diff --git a/benchmarks/order_book_bench.cpp b/benchmarks/order_book_bench.cpp
+index 38c8be9..e898347 100644
+--- a/benchmarks/order_book_bench.cpp
++++ b/benchmarks/order_book_bench.cpp
+@@ -5,18 +5,13 @@
+ #include <numeric>
+ 
+ #include "order_book.h"
++#include "throughput_workloads.h"
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+ // INPUT GENERATORS (Pre-computed, no RNG in timed loops)
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-struct OrderInput {
+-    Side side;
+-    uint32_t price;
+-    uint32_t quantity;
+-    uint64_t id;
+-    uint64_t participantId;
+-};
++using OrderInput = throughput_workloads::OrderInput;
+ 
+ class InputGenerator {
+ public:
+@@ -26,25 +21,7 @@ public:
+     std::vector<OrderInput> generateRestingOrders(std::size_t count, 
+                                                    uint32_t bidStart = 90, 
+                                                    uint32_t askStart = 110) {
+-        std::vector<OrderInput> inputs;
+-        inputs.reserve(count);
+-        
+-        std::uniform_int_distribution<uint32_t> qtyDist(1, 100);
+-        std::uniform_int_distribution<uint32_t> priceDist(0, 9);
+-        std::uniform_int_distribution<uint64_t> partDist(1, 100);
+-        
+-        for (std::size_t i = 0; i < count; ++i) {
+-            bool isBuy = (i % 2 == 0);
+-            uint32_t basePrice = isBuy ? bidStart : askStart;
+-            inputs.push_back({
+-                isBuy ? Side::Buy : Side::Sell,
+-                basePrice + priceDist(rng_),
+-                qtyDist(rng_),
+-                i + 1,
+-                partDist(rng_)
+-            });
+-        }
+-        return inputs;
++        return throughput_workloads::generateRestingOrders(count, rng_, bidStart, askStart);
+     }
+ 
+     // Aggressive crossing orders
+@@ -166,74 +143,108 @@ static void BM_AddOnly_Resting(benchmark::State& state) {
+     
+     InputGenerator gen;
+     auto inputs = gen.generateRestingOrders(numOrders);
++    const auto validation = throughput_workloads::validateRestingOrders(inputs);
++    if (!validation.error.empty()) {
++        state.SkipWithError(validation.error.c_str());
++        return;
++    }
+     
+     for (auto _ : state) {
+         state.PauseTiming();
+-        OrderBook book(numOrders + 100, noOpCallback);
++        {
++            OrderBook book(numOrders + 100, noOpCallback);
++            auto* observableBook = &book;
++            benchmark::DoNotOptimize(observableBook);
++            benchmark::ClobberMemory();
++            state.ResumeTiming();
++
++            for (const auto& input : inputs) {
++                book.addLimitOrder(input.side, input.price, input.quantity,
++                                   input.id, input.participantId);
++            }
++
++            benchmark::DoNotOptimize(observableBook);
++            benchmark::ClobberMemory();
++            state.PauseTiming();
++        }  // Destruction, including remaining index nodes, is benchmark cleanup.
+         state.ResumeTiming();
+-        
+-        for (const auto& input : inputs) {
+-            book.addLimitOrder(input.side, input.price, input.quantity, 
+-                              input.id, input.participantId);
+-        }
+-        
+-        benchmark::DoNotOptimize(book.bestBid());
+-        benchmark::DoNotOptimize(book.bestAsk());
+-        benchmark::ClobberMemory();
+     }
+     
+     state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(numOrders));
+-    state.SetLabel("orders/iter");
++    state.counters["incoming_orders_per_batch"] = static_cast<double>(numOrders);
++    state.counters["initial_orders"] = 0;
++    state.counters["final_orders"] = static_cast<double>(validation.finalOrders);
++    state.counters["validated_trades_per_batch"] = static_cast<double>(validation.tradeCount);
++    state.counters["validated_no_smp"] = 1;
++    state.SetLabel("non-crossing additions; no-op callback; elapsed time; allocations included");
+ }
+ 
+ BENCHMARK(BM_AddOnly_Resting)
+     ->Arg(100)
+     ->Arg(1000)
+     ->Arg(10000)
++    ->UseRealTime()
+     ->Unit(benchmark::kMicrosecond);
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
+-// BENCHMARK: MATCH HEAVY (Crossing Orders)
++// BENCHMARK: ONE-TO-ONE FULL FILLS (N resting sells, N/2 incoming buys)
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+-static void BM_MatchHeavy(benchmark::State& state) {
++static void BM_MatchOneToOne(benchmark::State& state) {
+     const auto numResting = static_cast<std::size_t>(state.range(0));
+     const auto numCrossing = numResting / 2;
+     
+-    InputGenerator gen;
+-    auto restingInputs = gen.generateRestingOrders(numResting);
+-    auto crossingInputs = gen.generateCrossingOrders(numCrossing);
++    const auto inputs = throughput_workloads::generateMatchingOrders(numResting);
++    const auto validation = throughput_workloads::validateMatchingOrders(inputs);
++    if (!validation.error.empty()) {
++        state.SkipWithError(validation.error.c_str());
++        return;
++    }
+     
+     for (auto _ : state) {
+         state.PauseTiming();
+-        OrderBook book(numResting + numCrossing + 100, noOpCallback);
+-        
+-        // Pre-populate book
+-        for (const auto& input : restingInputs) {
+-            book.addLimitOrder(input.side, input.price, input.quantity,
+-                              input.id, input.participantId);
++        {
++            OrderBook book(numResting + numCrossing + 100, noOpCallback);
++            for (const auto& input : inputs.resting) {
++                book.addLimitOrder(input.side, input.price, input.quantity,
++                                   input.id, input.participantId);
++            }
++            auto* observableBook = &book;
++            benchmark::DoNotOptimize(observableBook);
++            benchmark::ClobberMemory();
++            state.ResumeTiming();
++
++            for (const auto& input : inputs.incoming) {
++                book.addLimitOrder(input.side, input.price, input.quantity,
++                                   input.id, input.participantId);
++            }
++
++            benchmark::DoNotOptimize(observableBook);
++            benchmark::ClobberMemory();
++            state.PauseTiming();
++            const auto* ask = book.bestAsk();
++            if (book.bestBid() || !ask || ask->price != 100 || ask->totalQuantity != numResting - numCrossing) {
++                state.SkipWithError("unexpected final one-to-one book state");
++                return;
++            }
+         }
+         state.ResumeTiming();
+-        
+-        // Timed: crossing orders that trigger matching
+-        for (const auto& input : crossingInputs) {
+-            book.addLimitOrder(input.side, input.price, input.quantity,
+-                              input.id, input.participantId);
+-        }
+-        
+-        benchmark::DoNotOptimize(book.bestBid());
+-        benchmark::DoNotOptimize(book.bestAsk());
+-        benchmark::ClobberMemory();
+     }
+     
+     state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(numCrossing));
+-    state.SetLabel("crossing orders/iter");
++    state.counters["incoming_orders_per_batch"] = static_cast<double>(numCrossing);
++    state.counters["initial_orders"] = static_cast<double>(numResting);
++    state.counters["final_orders"] = static_cast<double>(validation.finalOrders);
++    state.counters["validated_trades_per_batch"] = static_cast<double>(validation.tradeCount);
++    state.counters["validated_no_smp"] = 1;
++    state.SetLabel("1:1 full fills; no-op callback; elapsed time; deallocations included");
+ }
+ 
+-BENCHMARK(BM_MatchHeavy)
++BENCHMARK(BM_MatchOneToOne)
+     ->Arg(100)
+     ->Arg(1000)
+     ->Arg(10000)
++    ->UseRealTime()
+     ->Unit(benchmark::kMicrosecond);
+ 
+ // ─────────────────────────────────────────────────────────────────────────────
