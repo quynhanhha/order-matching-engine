@@ -1,157 +1,93 @@
 # Synthetic batch API throughput
 
-## Scope and summary
+The engine sustains **40.895 million resting additions/sec** and **50.791 million incoming full fills/sec** in the 10,000-order workloads below. These are single-threaded, amortized batch rates with an empty callback. Setup and teardown are excluded; allocations and deallocations inside API calls are included. They do not establish production capacity or individual-order latency.
 
-Measured on 2026-10-09: **41.478 million resting additions/sec** for batches of 10,000 non-crossing additions, and **53.245 million incoming one-to-one full fills/sec** for batches of 5,000 against 10,000 resting orders. Each is the median of ten rates from two consecutive process runs, with five repetitions per run.
+## Environment and source
 
-The experiment measures single-threaded, synthetic, amortized batch API throughput with an empty trade callback. It excludes setup and teardown and preserves allocation/deallocation performed inside API calls. It does not measure production exchange capacity or individual-order latency percentiles.
-
-## Source version and environment
-
-The [measured source archive](evidence/2026-10-09-throughput/measured-source.tar.gz) contains the 21 build, engine, benchmark, test, and runner files used in the experiment. Every file matches existing commit **`a8edeb48184757bfab19abc042a66788a5deb5d5`** byte-for-byte. This commit identifies the measured code; the measurement's original recorded base was `3c3541a913269f44a10dc783d69078fb68541e62` plus the captured benchmark changes. The [source manifest](evidence/2026-10-09-throughput/source-sha256.txt) and [provenance record](evidence/2026-10-09-throughput/provenance.json) are the precise identities.
-
-| Property | Recorded value |
+| Property | Measurement setting |
 |---|---|
-| CPU | Apple M3 Pro, 12 physical/logical cores; model Mac15,6 |
-| Memory | 36 GiB (38,654,705,664 bytes) |
-| OS | macOS 26.5.2; Darwin 25.5.0; arm64 |
-| Compiler | Apple Clang 21.0.0, `clang-2100.1.1.101` |
-| CMake | 4.2.0 |
-| Project standard | C++20 |
-| Release project flags | `-O3 -DNDEBUG -march=native -flto -std=c++20 -arch arm64` |
-| Google Benchmark | v1.8.3, `344117638c8ff7e239044fd0fa7085839fc03021` |
-| Google Test | v1.14.0, `f8d7d77c06936315286eb55f8de22cd23c188571` |
-| Power | AC power; low-power mode disabled |
-| CPU controls | Affinity, core placement, and frequency not controlled |
+| Platform | macOS 26.5.2, Darwin 25.5.0; Apple M3 Pro, Mac15,6; 6 performance + 6 efficiency cores |
+| Memory | 36 GB RAM |
+| Compiler / build | Apple Clang 21.0.0; CMake 4.2.0; C++20 |
+| Release flags | `-O3 -DNDEBUG -march=native -flto -std=c++20` |
+| Dependencies | Google Benchmark v1.8.3; Google Test v1.14.0 |
+| Power / CPU controls | AC power; affinity, core placement, and frequency uncontrolled |
 
-The [compiler commands](evidence/2026-10-09-throughput/compile_commands.json) retain effective flags, including repeated target optimization flags and strict core-library warnings. The [link command](evidence/2026-10-09-throughput/link-command.txt) records LTO at linkage. Google Benchmark itself is compiled as C++11; engine and benchmark project sources use C++20. Environment records [before](evidence/2026-10-09-throughput/environment-before.txt) and [after](evidence/2026-10-09-throughput/environment-after.txt) include power/thermal queries. “No recorded warning” does not establish a fixed temperature, frequency, or absence of interference.
+The [evidence index](evidence/README.md#current-document-support) identifies source hashes, effective compiler commands, dependency commits, executable hash, environment records, every repetition, and reproduction tools. Thermal queries are restricted; the benchmark's estimated CPU frequency is not a measured clock rate. Google Benchmark uses C++11 internally; project sources use C++20.
 
-## Workload definitions
+## Workloads
 
-### Non-crossing resting additions
+| | Resting additions | One-to-one full fills |
+|---|---|---|
+| N | 100, 1,000, or 10,000 incoming calls | 100, 1,000, or 10,000 initial resting sells |
+| Calls per batch | N | N/2 incoming buys |
+| Capacity | N + 100 | N + N/2 + 100 |
+| Prices / quantities | Alternating buys at 90–99 and sells at 110–119; quantities 1–100 | All orders at price 100, quantity one |
+| Participants / IDs | Participants 1–100; unique sequential IDs | Resting participant 1, incoming participant 2; disjoint sequential IDs |
+| Depth | Empty to N; up to 20 price levels | N to N/2; one populated level throughout |
+| Expected outcomes | All orders rest; no trades or SMP | Each incoming order fills the next FIFO order; no SMP |
 
-- N = 100, 1,000, or 10,000 API calls per batch; each iteration starts with an empty book of capacity N + 100.
-- `std::mt19937_64`, seed 42; alternating buy/sell sides; uniform bids 90–99, asks 110–119, quantities 1–100, and participant IDs 1–100. IDs are unique and sequential.
-- All N orders rest across up to 20 price levels. Depth grows from zero to N; zero trades and zero SMP cancellations are expected.
-- Resting index-node allocation remains inside the measured `addLimitOrder` calls. Pre-reserved buckets do not eliminate node allocations.
+Resting inputs use `std::mt19937_64`, seed 42, and uniform price, quantity, and participant distributions. Every submission checks the resting-ID index before allocation or matching. Resting additions allocate one index node; full fills erase and free a resting node without inserting an incoming node.
 
-### Single-price-level, one-to-one full fills
+The full-fill case avoids level removal, partial fills, SMP, and multi-level sweeps. Its N = 10,000 registration measures **5,000 incoming calls**, not 10,000.
 
-- N = 100, 1,000, or 10,000 initially resting sells at price 100, quantity one, participant 1; capacity N + N/2 + 100.
-- N/2 incoming buys at price 100, quantity one, participant 2, with disjoint sequential IDs. Each fully fills the next resting FIFO order and produces one trade.
-- Depth falls from N to N/2. The sole price level remains present: this is a **favorable case that avoids price-level removal, partial fills, SMP, and multi-level lookup/sweeping**.
-- Pool operations and index-node erase/deallocation are timed. Incoming full fills do not insert an incoming index node. The empty callback receives trades but performs no useful trade-output processing.
+## Measurement and validation
 
-The matching registration argument denotes initial population N, not incoming-call count. Its 10,000 case times **5,000 incoming calls and 5,000 full fills**, not 10,000 incoming orders.
+Inputs are prepared outside timing and replayed with a recording callback. Validation checks trade IDs, prices, quantities, counts, final contents, FIFO links, aggregate quantities, cancellation/index reachability, and absence of SMP. Timed matching replays also check final best prices and aggregates outside timing; outcome counters describe the validated deterministic trace.
 
-## Measurement methodology
+Each iteration uses a fresh book. `PauseTiming()` / `ResumeTiming()` exclude construction, prepopulation, validation, and destruction. API memory costs, input traversal, optimization barriers, and residual framework timing overhead remain included. In particular, resting-book teardown frees N index nodes outside measurement, so these rates do not describe an add-plus-destruction workload.
 
-Each benchmark precomputes input outside timing, then validates it in an untimed replay with a recording callback. Validation checks trade counts, IDs, prices and quantities; complete final book contents and FIFO links; order indexing through cancellation; and absence of SMP cancellations. The actual timed matching replay also checks final best prices and aggregate quantity outside measurement. Reported outcome counters describe the validated deterministic trace, rather than timed callback bookkeeping.
+Both cases use `UseRealTime()` and count incoming calls with `SetItemsProcessed`:
 
-Each iteration constructs a fresh book. Construction, matching-book prepopulation, validation, and destruction are excluded with `PauseTiming()`/`ResumeTiming()`. **API-internal memory costs are retained**, including resting hash-node allocation and filled-order hash-node deallocation. Input traversal, observation barriers, and residual framework timing-transition overhead remain part of the measurement. The book address escapes to optimization barriers; calls to `addLimitOrder` and its allocation/deallocation paths were retained in optimized output.
+`calls/sec = calls per batch / measured elapsed seconds per batch`
 
-Setup and teardown exclusion is material to interpretation. In particular, teardown frees all N index nodes after a resting-add batch; including it adds per-order work to an add-plus-destruction measurement and materially affects the rate being reported.
+Two process sessions each retain five repetitions per case, with one-second warmup, at least one second of measured time, adaptive iteration counts, and randomized repetition interleaving. The sessions are not consecutive; no repetitions are discarded. The checker requires all six cases, unique repetition indices, consistent call/time accounting, and expected outcome counters.
 
-Both primary cases use Google Benchmark's `UseRealTime()`. For each repetition:
+## Results
 
-`incoming API calls/sec = calls per batch / measured elapsed seconds per batch`
+Rates are millions of incoming calls per measured second. Each median and range includes all ten repetitions. Sample CV is standard deviation divided by mean; session gap is the absolute difference between session medians divided by their mean.
 
-`SetItemsProcessed` counts all incoming calls across iterations. CPU time is retained as a separate field. Paused work is excluded from both primary timing intervals, so the rate is not whole-process sustained throughput including setup and cleanup.
-
-Two **consecutive process runs on the same machine** each retain five repetitions per case. They are not independently controlled experiments. Each case requests one second of warmup and at least one second of measured time, with adaptive iteration counts and randomized repetition interleaving. No repetitions are discarded.
-
-The result checker requires all six cases and five unique repetition indices in each run, reconciles rates with elapsed time and call counts, and validates outcome counters. The summary uses the median of all ten rates, their full range, sample coefficient of variation (standard deviation divided by mean), and absolute difference between the two run medians divided by their mean.
-
-## Results and variability
-
-Rates below are millions of incoming API calls per measured elapsed second. For resting additions, N is batch size and initial depth is zero; for full fills, N is initial depth and batch size is N/2.
-
-| Workload | N | Calls/batch | Median M/sec | Full range M/sec | Sample CV | Run-median difference |
+| Workload | N | Calls/batch | Median M/sec | Range M/sec | Sample CV | Session gap |
 |---|---:|---:|---:|---:|---:|---:|
-| Resting additions | 100 | 100 | 31.293 | 30.188–31.859 | 1.69% | 0.74% |
-| Resting additions | 1,000 | 1,000 | 39.860 | 38.723–40.224 | 1.28% | 1.16% |
-| Resting additions | 10,000 | 10,000 | 41.478 | 39.871–42.162 | 1.78% | 0.06% |
-| One-to-one full fills | 100 | 50 | 27.217 | 26.545–27.718 | 1.53% | 1.91% |
-| One-to-one full fills | 1,000 | 500 | 49.038 | 47.790–49.690 | 1.14% | 0.54% |
-| One-to-one full fills | 10,000 | 5,000 | 53.245 | 51.133–54.254 | 1.84% | 1.60% |
+| Resting additions | 100 | 100 | 30.618 | 29.457–30.916 | 1.68% | 0.53% |
+| Resting additions | 1,000 | 1,000 | 38.696 | 37.696–38.964 | 1.00% | 0.23% |
+| Resting additions | 10,000 | 10,000 | 40.895 | 40.209–41.474 | 0.97% | 1.13% |
+| One-to-one full fills | 100 | 50 | 26.657 | 26.339–26.919 | 0.75% | 1.05% |
+| One-to-one full fills | 1,000 | 500 | 46.829 | 46.261–47.563 | 0.95% | 0.61% |
+| One-to-one full fills | 10,000 | 5,000 | 50.791 | 44.123–51.369 | 4.38% | 0.02% |
 
-At N = 10,000, resting additions have 1.78% sample CV and 0.06% run-median difference; full fills have 1.84% CV and 1.60% run-median difference. These describe observed variability, not a confidence interval or a guarantee of future performance. [Raw run 1](evidence/2026-10-09-throughput/session-1.json), [raw run 2](evidence/2026-10-09-throughput/session-2.json), and the [machine-readable summary](evidence/2026-10-09-throughput/summary.json) preserve every repetition and statistic.
+[Session 1](evidence/2026-10-09-current/session-1.json), [session 2](evidence/2026-10-09-current/session-2.json), and the [summary](evidence/2026-10-09-current/summary.json) retain every rate and statistic. Spread describes observed variability, not confidence intervals or future guarantees; the low session gap for large full fills does not eliminate the spread within sessions.
 
-## Interpretation and limitations
+## Limits
 
-The favorable full-fill case has a narrow, predictable distribution and retains one populated price level throughout. It does not establish throughput for changing level counts, partial fills, SMP, cancellations, or realistic mixed traffic. The resting case grows an initially empty book; it is not a fixed-depth steady-state workload.
-
-The smaller batches report lower rates. Fixed timing/framework costs amortize differently, and batch size also changes book footprint, allocator/cache behavior, and population trajectory. The differences cannot be attributed solely to timer overhead. Large-batch figures remain synthetic, warmed measurements with real allocator costs under these conditions.
-
-The empty callback excludes logging, serialization, event queues, persistence, and downstream trade processing. The experiment also excludes network ingestion and queueing, concurrency, and setup/teardown costs. CPU placement and other machine activity were not independently controlled. The measurements have not been replicated across machines, operating systems, or toolchains; `-march=native`, LTO, the standard library, and allocator affect results.
-
-Throughput reciprocals are amortized costs, not individual-order latency samples. No individual-operation median or p99 latency is established by this experiment. On the measured machine, `mach_absolute_time()` advances in ticks of 125/3 ≈ 41.7 ns (24 MHz timebase), coarser than the roughly 24 ns amortized cost per resting addition reported here, so single operations cannot be resolved with that timer.
+- Full fills use a predictable single-level book; resting additions grow an empty book. Neither covers realistic mixed traffic, fixed-depth steady state, cancellation, partial fills, SMP, or changing level counts.
+- Smaller batches amortize framework costs differently and also change footprint, cache/allocator behavior, and population trajectory. Their rate differences cannot be assigned solely to timer overhead.
+- The empty callback excludes logging, serialization, queues, persistence, and downstream trade processing. Network ingestion, concurrency, setup, and cleanup are also excluded.
+- Results depend on this machine, OS, standard library, allocator, toolchain, native code generation, and LTO. Core placement, frequency, thermal conditions, and background activity are uncontrolled; other platforms are unvalidated.
+- Throughput reciprocals are amortized costs, not individual-order median or p99 latency. `mach_absolute_time()` advances in 125/3 ≈ 41.7 ns ticks, coarser than the roughly 24.5 ns amortized resting-addition cost, so that timer cannot resolve single calls at this rate.
 
 ## Reproduction
 
-### Supported environment and dependency preparation
+Provide a C++20 toolchain, CMake 3.16+, Git, Bash, and Python 3.9+ (standard library only). The measured environment is macOS/Apple Silicon with Apple Clang 21.
 
-The recorded protocol was exercised on macOS/Apple Silicon with Apple Clang 21 and CMake 4.2.0. Install the platform command-line toolchain and provide CMake 3.16 or newer, Git, Bash, and Python 3.9 or newer. Python uses only its standard library. Other Clang/GNU environments may build the project, but the published rates and reproduction helper have not been validated there.
-
-From a fresh clone's root, this helper acquires the project's existing dependencies at the exact recorded versions and invokes the unchanged runner:
+From the repository root:
 
 ```bash
 bash docs/evidence/2026-10-09-throughput/reproduce.sh
 ```
 
-The helper downloads Google Benchmark v1.8.3 and Google Test v1.14.0 into `.cache/throughput-deps/`, checks their exact commits and clean working trees, and then sets the runner's dependency-path variables. It reuses valid existing checkouts without overwriting them. Initial acquisition requires network access; subsequent CMake configuration is disconnected.
-
-Equivalent explicit preparation and invocation:
+The helper prepares clean, pinned dependency checkouts in `.cache/throughput-deps/` and invokes [the runner](../scripts/run_throughput.sh). Initial downloads require network access; CMake builds use the prepared sources without downloads. `THROUGHPUT_DEPS_DIR` selects a cache, and `CXX` selects a compiler. To use prepared checkouts directly:
 
 ```bash
-mkdir -p .cache/throughput-deps
-git clone --depth 1 --branch v1.8.3 https://github.com/google/benchmark.git \
-  .cache/throughput-deps/benchmark
-git clone --depth 1 --branch v1.14.0 https://github.com/google/googletest.git \
-  .cache/throughput-deps/googletest
-
-test "$(git -C .cache/throughput-deps/benchmark rev-parse HEAD)" = \
-  344117638c8ff7e239044fd0fa7085839fc03021
-test "$(git -C .cache/throughput-deps/googletest rev-parse HEAD)" = \
-  f8d7d77c06936315286eb55f8de22cd23c188571
-
 BENCHMARK_SOURCE_DIR="$PWD/.cache/throughput-deps/benchmark" \
 GOOGLETEST_SOURCE_DIR="$PWD/.cache/throughput-deps/googletest" \
 CXX=/usr/bin/clang++ bash scripts/run_throughput.sh repaired
 ```
 
-These clone commands assume absent destination directories; the helper handles existing clean caches. `THROUGHPUT_DEPS_DIR` selects another cache for the helper, and `CXX` selects a compiler. Use AC power and record other substantial machine activity; the helper does not change power settings or pin cores.
+The runner gates measurements on the Debug ASan/UBSan suite and Python accounting tests, verifies Release flags and absence of sanitizers, then records two consecutive sessions with the settings above. It creates `benchmark_results/<UTC timestamp>-repaired/`, refuses existing destinations, and stops on build, test, or accounting failure. Output includes source snapshots, hashes, build/test logs, environment, raw JSON, and summaries. Use AC power; the runner does not change power settings or pin cores.
 
-### Build, checks, and output
-
-The runner first configures a separate Debug build with `BUILD_TESTS=ON`, `BUILD_BENCHMARKS=OFF`, and the supplied Google Test source directory. It builds and runs all C++ tests with ASan/UBSan, then the six Python accounting tests. It next configures Release with `BUILD_TESTS=OFF`, `BUILD_BENCHMARKS=ON`, and the supplied Google Benchmark source directory; builds `order_book_bench`; verifies optimization/LTO/C++20 flags and absence of sanitizers; records the binary hash; and runs:
+Correctness evidence contains **93 passing Debug C++ cases**, **72 relevant Release cases**, and **six Python accounting cases**. Release checks exclude assertion-dependent pool death tests. Verify source identity, artifact hashes, and result calculations without benchmarking:
 
 ```bash
-# The runner executes this for each of two consecutive process runs.
-"$results/build-release/order_book_bench" \
-  --benchmark_filter='^(BM_AddOnly_Resting|BM_MatchOneToOne)/[0-9]+/real_time$' \
-  --benchmark_min_time=1s --benchmark_min_warmup_time=1 \
-  --benchmark_repetitions=5 --benchmark_enable_random_interleaving=true \
-  --benchmark_out="$results/session-$session.json" --benchmark_out_format=json
+PYTHONDONTWRITEBYTECODE=1 python3 docs/evidence/2026-10-09-current/verify_evidence.py
 ```
-
-`results` and `session` are runner variables, not commands to paste without initialization. See the [archived exact command trace](evidence/2026-10-09-throughput/commands.sh) and archived runner in the source archive for all CMake/build options and inline Python steps; recorded absolute paths describe the measured machine, not required paths for a fresh clone.
-
-New files go to `benchmark_results/<UTC timestamp>-repaired/`: raw JSON and console output, summaries, environment records, compiler commands, source snapshots/manifests, binary hash, and test/build logs. The runner refuses to overwrite an existing directory and stops on build, correctness, or accounting failure. Do not replace the published evidence with a new run without reviewing its source and conditions.
-
-To rebuild the **exact measured code**, use a separate full-history clone checked out at `a8edeb48184757bfab19abc042a66788a5deb5d5`, then run the explicit dependency preparation and runner invocation above. The repository evidence helper is a later documentation addition and need not exist at that older checkout. To inspect the recorded source without checking out that commit, use the source archive and manifest. Matching source does not guarantee identical rates or executable hashes under a different toolchain, SDK, path, or machine.
-
-## Supporting evidence
-
-The [compact repository bundle](evidence/2026-10-09-throughput/README.md) contains raw JSON/console output, summary statistics, recorded commands, environment and compile/link flags, dependency identities, a hashed measured-source archive, executable provenance, and correctness logs. It excludes executables, generated build trees, and the large disassembly dump.
-
-Correctness evidence records **81 passing C++ sanitizer-enabled tests**, including nine focused workload tests, and **six passing Python accounting tests** before measurement. The Python fixtures are explicitly synthetic tests, not reported measurements. Inspect the [C++ log](evidence/2026-10-09-throughput/tests-sanitizers.txt) and [Python log](evidence/2026-10-09-throughput/tests-summary.txt).
-
-Validate the bundle without running benchmarks or rewriting recorded results:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python3 \
-  docs/evidence/2026-10-09-throughput/verify_evidence.py
-```
-
-The verifier checks artifact/source hashes, measured-code commit identity, all raw repetitions and rate/outcome accounting, the summary, dependency/test records, and that evidence files are not Git-ignored. No measurements need to be repeated to inspect the published result calculations.

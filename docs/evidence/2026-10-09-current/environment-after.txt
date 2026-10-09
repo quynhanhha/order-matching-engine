@@ -1,0 +1,25 @@
+2026-10-09T07:46:01.776761+00:00
+['uname', '-a']
+Darwin qa-2.local 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:29 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T6030 arm64
+['clang++', '--version']
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin25.5.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+['cmake', '--version']
+cmake version 4.2.0
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+['sw_vers']
+ProductName:		macOS
+ProductVersion:		26.5.2
+BuildVersion:		25F84
+['sysctl', '-n', 'hw.model', 'machdep.cpu.brand_string', 'hw.memsize', 'hw.ncpu']
+sysctl: sysctl fmt -1 1024 1: Operation not permitted
+['pmset', '-g', 'batt']
+Now drawing from 'AC Power'
+ -InternalBattery-0 (id=35520611)	100%; charged; 0:00 remaining present: true
+['pmset', '-g', 'therm']
+Error:Failed to get thermal warning level with error code 0xe00002bc
+Error: Failed to get performance warning level with error code 0xe00002bc
+Error: No CPU power status with error code 0xe00002bc

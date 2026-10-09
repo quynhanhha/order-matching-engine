@@ -1,0 +1,2 @@
+partial/10000 rep=0 batches=666 ops=3330000 (timing not reported in allocation-counting build)
+partial/10000 rep=0 alloc_per_op=0.000000 free_per_op=0.000000 bytes_per_op=0.000 max_size=0 sizes:

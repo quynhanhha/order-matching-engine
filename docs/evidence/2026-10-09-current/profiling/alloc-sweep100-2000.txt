@@ -1,0 +1,2 @@
+sweep100/2000 rep=0 batches=274 ops=5480 (timing not reported in allocation-counting build)
+sweep100/2000 rep=0 alloc_per_op=0.000000 free_per_op=100.000000 bytes_per_op=0.000 max_size=0 sizes:

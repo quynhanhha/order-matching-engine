@@ -1,0 +1,16 @@
+['date', '-u', '+%Y-%m-%dT%H:%M:%SZ']
+2026-10-09T08:00:45Z
+['uname', '-a']
+Darwin qa-2.local 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:29 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T6030 arm64
+['clang++', '--version']
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin25.5.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+['sw_vers']
+ProductName:		macOS
+ProductVersion:		26.5.2
+BuildVersion:		25F84
+['pmset', '-g', 'batt']
+Now drawing from 'AC Power'
+ -InternalBattery-0 (id=35520611)	100%; charged; 0:00 remaining present: true

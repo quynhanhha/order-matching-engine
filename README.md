@@ -1,6 +1,6 @@
 # Order Matching Engine
 
-A C++20 limit order book and matching engine with price–time priority, partial and full fills, cancellation, and self-match prevention. The project focuses on explicit memory management and measurable API behavior.
+A single-threaded C++20 limit order book with price–time priority, partial and full fills, cancellation, and self-match prevention (SMP).
 
 ## Features and matching behavior
 
@@ -8,9 +8,12 @@ A C++20 limit order book and matching engine with price–time priority, partial
 - Buys match the lowest ask; sells match the highest bid. Trades execute at the resting order's price, with FIFO priority within a price level.
 - Unfilled incoming quantity rests, except when self-match prevention encounters the same participant at the head of the opposing queue: the incoming remainder is cancelled.
 - A synchronous, templated callback receives each trade's buy order ID, sell order ID, price, and quantity.
-- Best bid/ask access returns the best price level in constant time.
+- `bestBid()` and `bestAsk()` return the best price level in constant time, or `nullptr` for an empty side. Returned pointers are borrowed and may be invalidated by book mutations.
+- Cancelling an absent ID is a no-op.
 
-The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply positive quantities and sufficient pool capacity. Order IDs must be unique among resting orders within each book, across both sides and all participants. `addLimitOrder` throws `std::invalid_argument` if an incoming ID already exists in the resting-order index, before allocating an order, changing book state, or invoking the trade callback. This check also applies to incoming orders that would execute immediately or encounter self-match prevention. IDs may be reused after cancellation or full execution; an incoming ID is also reusable after self-match prevention cancels its remainder. Partial fills keep an ID reserved while its remainder rests. The [profiling report](docs/profiling-report.md#82-correctness-finding-duplicate-order-ids) records the historical defect that motivated this check.
+Callers supply positive quantities and sufficient pool capacity, including a slot for the incoming order. IDs must be unique among resting orders in each book, across both sides and all participants. `addLimitOrder` throws `std::invalid_argument` on an indexed ID before allocation, mutation, or callback, even if the order would execute immediately or encounter SMP. IDs are reusable after cancellation, full execution, or SMP cancellation; a resting remainder keeps its ID reserved.
+
+Market/IOC/FOK orders, network ingestion, persistence, concurrent access, and callbacks that recursively mutate the same book are outside the supported scope.
 
 ## Architecture and memory management
 
@@ -21,11 +24,11 @@ The engine currently implements limit orders for a single book. Market/IOC/FOK o
 | `PriceLevel` | Aggregate quantity and an intrusive FIFO queue of orders |
 | `OrderBook<TradeCallback>` | Sorted price-level vectors, a reserved order-ID hash index, and a templated trade callback |
 
-Bids are stored ascending and asks descending, with the best price at each vector's back. Price lookup uses `lower_bound`; inserting or erasing levels can shift vector elements. Order-ID lookup is average O(1), but a full cancellation also looks up a price level and may erase it, so cancellation is not universally O(1).
+Bids are ascending and asks descending, with the best level at the back. Price lookup uses `lower_bound`; level insertion and cancellation can shift vector elements. Cancellation combines an average O(1) ID lookup with O(log L) price lookup and up to O(L) level shifting, where L is the side's level count.
 
-The pool and price-level vector capacity are allocated during construction; the ID index reserves buckets up front. **Resting additions still allocate hash-map nodes.** Fully filled incoming orders use pool storage and do not insert an incoming index node, but matching can deallocate filled resting orders' hash nodes. A resting remainder can allocate an index node, and callbacks can allocate independently. Execution is therefore not universally allocation-free.
+Construction allocates the fixed-capacity pool, reserves 4,096 levels per side, and reserves index buckets. Resting orders allocate hash-map nodes; filled or cancelled resting orders free them. Fully executed incoming orders allocate no index node. Duplicate checks allocate nothing for valid inputs; exceptions and callbacks may allocate. The level-capacity bound is asserted in Debug; Release can grow the vectors.
 
-FIFO links, positive resting quantities, aggregate quantities, sorted levels, index cleanup, and empty-book transitions are covered by tests. Debug builds also enable assertions and sanitizers. Best-price pointers are borrowed and should not be retained across book mutations that can invalidate vector elements.
+Tests cover FIFO links, aggregates, price priority, matching, SMP, cancellation, duplicate rejection, ID reuse, allocation, and empty-book transitions.
 
 ## API example
 
@@ -47,11 +50,11 @@ int main() {
 }
 ```
 
-The public API also provides `bestBid()` and `bestAsk()`, returning `const PriceLevel*` or `nullptr`. Cancelling an absent ID is a no-op. See [the book implementation](include/order_book.h), [trade types](include/types.h), and [matching tests](tests/order_book_matching_tests.cpp).
+See [the book API](include/order_book.h), [trade types](include/types.h), and [matching tests](tests/order_book_matching_tests.cpp).
 
 ## Build and test
 
-The published benchmark environment is macOS on Apple Silicon with Apple Clang 21. Build prerequisites are a C++20 compiler, CMake 3.16 or newer, Git, and the platform toolchain. The throughput workflow additionally uses Bash and Python 3.9 or newer (standard library only). Clang/GNU build flags are configured; other platforms and compilers have not been validated for the published rates.
+Requirements: a C++20 compiler, CMake 3.16+, Git, and the platform toolchain. The benchmark workflow also needs Bash and Python 3.9+ (standard library only). Clang/GNU flags are configured; reported measurements use macOS/Apple Silicon and Apple Clang 21.
 
 A Debug build enables AddressSanitizer and UndefinedBehaviorSanitizer with Clang/GNU:
 
@@ -65,22 +68,20 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover \
   -s tests -p test_throughput_summary.py
 ```
 
-CMake fetches Google Test **v1.14.0** for tests and Google Benchmark **v1.8.3** when benchmarks are enabled. Initial dependency acquisition requires network access. The benchmark reproduction helper below prepares pinned checkouts explicitly and then uses disconnected builds.
+CMake fetches Google Test **v1.14.0** and, with benchmarks enabled, Google Benchmark **v1.8.3**. Initial acquisition requires network access.
 
 ## Performance
 
-Measured on Apple M3 Pro with 36 GiB memory, macOS 26.5.2, Apple Clang 21, C++20, and Release flags including `-O3 -DNDEBUG -march=native -flto`:
+Measured on Apple M3 Pro with 36 GB RAM, macOS 26.5.2, Apple Clang 21, and `-O3 -DNDEBUG -march=native -flto`:
 
 | Synthetic workload | Median rate | Range across ten measurements |
 |---|---:|---:|
-| 10,000 non-crossing additions into an empty book | **41.478M resting additions/sec** | 39.871–42.162M/sec |
-| 5,000 one-to-one full fills against 10,000 quantity-one sells at one price | **53.245M incoming full fills/sec** | 51.133–54.254M/sec |
+| 10,000 non-crossing additions into an empty book | **40.895M resting additions/sec** | 40.209–41.474M/sec |
+| 5,000 one-to-one full fills against 10,000 quantity-one sells at one price | **50.791M incoming full fills/sec** | 44.123–51.369M/sec |
 
-These are single-threaded, amortized batch API rates with an empty trade callback, measured in two consecutive process runs with five repetitions each. Setup and teardown are excluded; allocation/deallocation inside API calls remains included. The matching workload is a favorable case with no price-level removal, partial fills, or SMP events. These results do not establish production exchange capacity or individual-order latency percentiles.
+These are amortized batch API rates with an empty callback, two process sessions, and five repetitions per session. Setup and teardown are excluded; API allocation/deallocation is included. Full fills keep one populated price level and exercise no partial fills or SMP. Rates do not establish production capacity or individual-order latency; CPU placement and frequency are uncontrolled.
 
-The [throughput report](docs/throughput-report.md) is the authoritative methodology and results document. The [repository evidence bundle](docs/evidence/2026-10-09-throughput/README.md) contains raw results, source identity, compiler/environment records, and test evidence.
-
-The [hot-path profiling report](docs/profiling-report.md) is a diagnostic investigation of where this time goes, and it adds no new throughput claims. Its main finding is that the order-ID index's per-order node allocation and free is the largest cost in both workloads. It also covers price-level lookup and cancellation behavior, and it has its own [evidence bundle](docs/evidence/2026-10-09-profiling/README.md).
+The [throughput report](docs/throughput-report.md) defines workloads and measurement limits. The [profiling report](docs/profiling-report.md) examines API costs, memory traffic, depth, and price-level count. The [evidence index](docs/evidence/README.md#current-document-support) identifies the raw results, source hashes, environment records, correctness logs, and reproduction tools.
 
 ## Reproduce throughput from a fresh clone
 
@@ -90,16 +91,16 @@ From the repository root on the supported macOS/Apple Clang environment:
 bash docs/evidence/2026-10-09-throughput/reproduce.sh
 ```
 
-This prepares clean, pinned Google Benchmark v1.8.3 and Google Test v1.14.0 checkouts in `.cache/throughput-deps/`, then invokes the existing runner. It runs correctness checks before building Release and recording both measurement sessions. New output is written to `benchmark_results/<UTC timestamp>-repaired/`; existing results are never overwritten.
+This prepares pinned dependencies in `.cache/throughput-deps/`, runs correctness checks, builds Release, and records two sessions in a new `benchmark_results/<UTC timestamp>-repaired/` directory.
 
 To inspect the published evidence without running benchmarks:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 \
-  docs/evidence/2026-10-09-throughput/verify_evidence.py
+  docs/evidence/2026-10-09-current/verify_evidence.py
 ```
 
-See the [report's reproduction instructions](docs/throughput-report.md#reproduction) for explicit dependency commands, rebuilding the exact measured source, compiler flags, and limitations. Other registered benchmarks and the latency harness remain diagnostic; their outputs are not part of the current performance claims.
+See [reproduction details](docs/throughput-report.md#reproduction) for dependency overrides and runner settings. Other benchmarks and the latency harness are diagnostic.
 
 ## Repository layout
 

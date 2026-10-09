@@ -1,0 +1,240 @@
+{
+  "timing": {
+    "add/10000": {
+      "median_ns": 24.1096,
+      "median_mops": 41.477,
+      "min_ns": 24.0061,
+      "max_ns": 24.7692
+    },
+    "match/10000": {
+      "median_ns": 19.1095,
+      "median_mops": 52.33,
+      "min_ns": 19.0368,
+      "max_ns": 19.2555
+    },
+    "partial/10000": {
+      "median_ns": 5.3064,
+      "median_mops": 188.453,
+      "min_ns": 5.1998,
+      "max_ns": 5.6972
+    },
+    "cancel-fifo/10000": {
+      "median_ns": 23.0871,
+      "median_mops": 43.314,
+      "min_ns": 22.9579,
+      "max_ns": 23.6272
+    },
+    "cancel-shuffled/10000": {
+      "median_ns": 38.4007,
+      "median_mops": 26.041,
+      "min_ns": 38.3385,
+      "max_ns": 40.428
+    },
+    "sweep1/2000": {
+      "median_ns": 19.4499,
+      "median_mops": 51.414,
+      "min_ns": 18.8654,
+      "max_ns": 20.2357
+    },
+    "sweep10/2000": {
+      "median_ns": 161.2908,
+      "median_mops": 6.2,
+      "min_ns": 158.3501,
+      "max_ns": 167.247
+    },
+    "sweep100/2000": {
+      "median_ns": 1493.2089,
+      "median_mops": 0.67,
+      "min_ns": 1489.6082,
+      "max_ns": 1546.2416
+    },
+    "iso-umap-insert/10000": {
+      "median_ns": 13.2204,
+      "median_mops": 75.641,
+      "min_ns": 12.9792,
+      "max_ns": 14.1392
+    },
+    "iso-umap-erase/10000": {
+      "median_ns": 13.5575,
+      "median_mops": 73.76,
+      "min_ns": 13.3644,
+      "max_ns": 14.2162
+    },
+    "iso-new32/10000": {
+      "median_ns": 10.8468,
+      "median_mops": 92.193,
+      "min_ns": 10.5181,
+      "max_ns": 11.465
+    },
+    "iso-delete32/10000": {
+      "median_ns": 10.2883,
+      "median_mops": 97.197,
+      "min_ns": 10.2306,
+      "max_ns": 10.8888
+    },
+    "add/100000": {
+      "median_ns": 24.6566,
+      "median_mops": 40.557,
+      "min_ns": 24.2677,
+      "max_ns": 25.5828
+    },
+    "match/100000": {
+      "median_ns": 19.3271,
+      "median_mops": 51.741,
+      "min_ns": 19.0102,
+      "max_ns": 20.1547
+    },
+    "cancel-fifo/100000": {
+      "median_ns": 23.5945,
+      "median_mops": 42.383,
+      "min_ns": 23.3896,
+      "max_ns": 23.9092
+    },
+    "cancel-shuffled/100000": {
+      "median_ns": 51.4896,
+      "median_mops": 19.421,
+      "min_ns": 44.169,
+      "max_ns": 54.4987
+    },
+    "add/1000000": {
+      "median_ns": 24.6343,
+      "median_mops": 40.594,
+      "min_ns": 24.4353,
+      "max_ns": 26.0353
+    },
+    "match/1000000": {
+      "median_ns": 20.2839,
+      "median_mops": 49.3,
+      "min_ns": 19.6143,
+      "max_ns": 21.4627
+    },
+    "cancel-fifo/1000000": {
+      "median_ns": 23.868,
+      "median_mops": 41.897,
+      "min_ns": 23.2311,
+      "max_ns": 24.5028
+    },
+    "cancel-shuffled/1000000": {
+      "median_ns": 190.4837,
+      "median_mops": 5.25,
+      "min_ns": 187.5446,
+      "max_ns": 195.1771
+    },
+    "levels1/10000": {
+      "median_ns": 18.1193,
+      "median_mops": 55.19,
+      "min_ns": 18.0521,
+      "max_ns": 19.1163
+    },
+    "levels4/10000": {
+      "median_ns": 23.9947,
+      "median_mops": 41.676,
+      "min_ns": 23.6242,
+      "max_ns": 24.7242
+    },
+    "levels6/10000": {
+      "median_ns": 18.7541,
+      "median_mops": 53.322,
+      "min_ns": 18.42,
+      "max_ns": 19.9413
+    },
+    "levels10/10000": {
+      "median_ns": 24.9076,
+      "median_mops": 40.148,
+      "min_ns": 24.4298,
+      "max_ns": 26.2606
+    },
+    "levels16/10000": {
+      "median_ns": 20.8191,
+      "median_mops": 48.033,
+      "min_ns": 20.5142,
+      "max_ns": 20.9874
+    },
+    "levels48/10000": {
+      "median_ns": 25.5317,
+      "median_mops": 39.167,
+      "min_ns": 25.4165,
+      "max_ns": 27.5229
+    },
+    "levels64/10000": {
+      "median_ns": 20.1851,
+      "median_mops": 49.541,
+      "min_ns": 20.077,
+      "max_ns": 20.524
+    },
+    "levels128/10000": {
+      "median_ns": 21.742,
+      "median_mops": 45.994,
+      "min_ns": 21.5991,
+      "max_ns": 24.4234
+    },
+    "levels512/10000": {
+      "median_ns": 31.3644,
+      "median_mops": 31.883,
+      "min_ns": 31.2547,
+      "max_ns": 32.0524
+    },
+    "levels1024/10000": {
+      "median_ns": 48.9781,
+      "median_mops": 20.417,
+      "min_ns": 47.5999,
+      "max_ns": 52.9345
+    },
+    "levels2048/10000": {
+      "median_ns": 91.3353,
+      "median_mops": 10.949,
+      "min_ns": 90.9785,
+      "max_ns": 92.362
+    }
+  },
+  "allocations": {
+    "add/10000": {
+      "allocations_per_call": 1.0,
+      "frees_per_call": 0.0,
+      "bytes_per_call": 32.0,
+      "max_size": 32.0
+    },
+    "match/10000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 1.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "partial/10000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 0.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "cancel-fifo/10000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 1.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "cancel-shuffled/10000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 1.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "sweep1/2000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 1.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "sweep10/2000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 10.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    },
+    "sweep100/2000": {
+      "allocations_per_call": 0.0,
+      "frees_per_call": 100.0,
+      "bytes_per_call": 0.0,
+      "max_size": 0.0
+    }
+  }
+}

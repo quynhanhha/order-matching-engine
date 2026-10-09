@@ -1,0 +1,6 @@
+iso-umap-insert/10000 rep=0 batches=2143 ops=21430000 timed_ns=278751486 ns_per_op=13.0075 Mops=76.879
+iso-umap-insert/10000 rep=1 batches=2144 ops=21440000 timed_ns=278273198 ns_per_op=12.9792 Mops=77.047
+iso-umap-insert/10000 rep=2 batches=2094 ops=20940000 timed_ns=278509911 ns_per_op=13.3004 Mops=75.186
+iso-umap-insert/10000 rep=3 batches=2100 ops=21000000 timed_ns=277628485 ns_per_op=13.2204 Mops=75.641
+iso-umap-insert/10000 rep=4 batches=1970 ops=19700000 timed_ns=278542660 ns_per_op=14.1392 Mops=70.725
+iso-umap-insert/10000 SUMMARY median_ns_per_op=13.2204 median_Mops=75.641 min=12.9792 max=14.1392

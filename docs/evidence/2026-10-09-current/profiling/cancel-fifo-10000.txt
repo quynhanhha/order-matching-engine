@@ -1,0 +1,6 @@
+cancel-fifo/10000 rep=0 batches=1019 ops=10190000 timed_ns=236940331 ns_per_op=23.2522 Mops=43.007
+cancel-fifo/10000 rep=1 batches=1003 ops=10030000 timed_ns=236981133 ns_per_op=23.6272 Mops=42.324
+cancel-fifo/10000 rep=2 batches=1033 ops=10330000 timed_ns=237339955 ns_per_op=22.9758 Mops=43.524
+cancel-fifo/10000 rep=3 batches=1033 ops=10330000 timed_ns=237155253 ns_per_op=22.9579 Mops=43.558
+cancel-fifo/10000 rep=4 batches=1028 ops=10280000 timed_ns=237335625 ns_per_op=23.0871 Mops=43.314
+cancel-fifo/10000 SUMMARY median_ns_per_op=23.0871 median_Mops=43.314 min=22.9579 max=23.6272

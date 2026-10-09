@@ -1,0 +1,6 @@
+partial/10000 rep=0 batches=1631 ops=8155000 timed_ns=43922343 ns_per_op=5.3859 Mops=185.669
+partial/10000 rep=1 batches=1603 ops=8015000 timed_ns=42530588 ns_per_op=5.3064 Mops=188.453
+partial/10000 rep=2 batches=1505 ops=7525000 timed_ns=42871524 ns_per_op=5.6972 Mops=175.524
+partial/10000 rep=3 batches=1621 ops=8105000 timed_ns=42681220 ns_per_op=5.2660 Mops=189.896
+partial/10000 rep=4 batches=1641 ops=8205000 timed_ns=42664209 ns_per_op=5.1998 Mops=192.316
+partial/10000 SUMMARY median_ns_per_op=5.3064 median_Mops=188.453 min=5.1998 max=5.6972

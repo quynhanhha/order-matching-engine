@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Read-only verification of the 2026-10-09 hot-path profiling evidence bundle.
 
-Recomputes every quantitative claim in docs/profiling-report.md from the raw files in this
-bundle and compares it with the published (rounded) value. Also checks file hashes, Git
+Recomputes the quantitative values in this bundle's METHODOLOGY.md from its raw files
+and compares them with the recorded (rounded) values. Also checks file hashes, Git
 visibility, derived-summary reproducibility, and the recorded integrity/correctness results.
 
 Run from anywhere:  PYTHONDONTWRITEBYTECODE=1 python3 docs/evidence/2026-10-09-profiling/verify_profiling_evidence.py
@@ -14,6 +14,7 @@ import re
 import statistics as st
 import subprocess
 import sys
+import tarfile
 from pathlib import Path
 
 B = Path(__file__).resolve().parent
@@ -332,12 +333,17 @@ check("bucket index uses a hardware divide", "udiv" in mexc)
 check("trade callback is an indirect call (blr)", "blr\tx10" in mexc)
 check("hash-table insert/erase are out-of-line calls; delete called on cancel",
       "__emplace_unique_key_args" in mexc and "__erase_unique" in mexc and "__ZdlPv" in mexc)
-src = (REPO / "include/order_book.h").read_text()
+with tarfile.open(REPO / "docs/evidence/2026-10-09-throughput/measured-source.tar.gz") as archive:
+    header = archive.extractfile("include/order_book.h")
+    assert header is not None
+    src = header.read().decode()
 check("4,096-level reservation and 0.7 load factor in source", "kDefaultMaxPriceLevels = 4096" in src and "max_load_factor(0.7f)" in src)
 check("4,096-level capacity is assert-only (Debug)", 'assert(bids_.size() < bids_.capacity()' in src)
 check("duplicate index entries are dropped by try_emplace", "orderIndex_.try_emplace(id, order);" in src)
-check("README states the unique-ID precondition and the duplicate-ID limitation",
-      "Callers supply unique order IDs" in (REPO / "README.md").read_text() and "Duplicate IDs are not detected" in (REPO / "README.md").read_text())
+measured_readme = subprocess.check_output(
+    ["git", "show", "0bad3d2c2bb9e9e1802c96f3cc8a7bc7bec0bd7f:README.md"], cwd=REPO, text=True)
+check("measured source requires unique IDs and has no pre-mutation duplicate check",
+      "Callers supply unique order IDs" in measured_readme and "orderIndex_.contains" not in src)
 
 print()
 if failures:

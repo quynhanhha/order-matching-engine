@@ -1,8 +1,8 @@
 # Profiling methodology and full results
 
-This document supports the [profiling report](../../profiling-report.md). It covers four things:
+This document describes the measurements in [this profiling bundle](README.md). It covers four things:
 - how each measurement was taken and validated (§1–§4)
-- the complete result matrices that the report only summarizes (§5)
+- the complete result matrices (§5)
 - an audit note on the verification scope (§6)
 - reproduction commands (§7)
 
@@ -189,9 +189,9 @@ At 2,048 levels per side (rev1, 5 × 2 s), an addition costs 90.41 ns, 1,274.5 i
 
 ## 6. Verification scope
 
-[`verify_profiling_evidence.py`](verify_profiling_evidence.py) recomputes every quantitative value above and in the report. It also checks bundle hashes, Git visibility, recorded integrity results, the provenance audit outcome, and byte-for-byte regeneration of the derived summaries.
+[`verify_profiling_evidence.py`](verify_profiling_evidence.py) recomputes the recorded quantitative values in this bundle. It also checks bundle hashes, Git visibility, recorded integrity results, the provenance audit outcome, and byte-for-byte regeneration of the derived summaries. Source/contract checks use the measured-source archive and the recorded source commit's README, not the current checkout's contract.
 
-Statements that are reasoned from code or disassembly rather than computed are labeled **Confirmed** in the report and point to the relevant excerpt. Examples: the 56-byte `Order` (divide by 56 via a multiply in `addLimitOrder`), 24-byte levels (stride `0x18`), 8-byte bucket pointers (`lsl #3`), and the indirect callback (`blr`).
+Code/disassembly checks refer to the measured source and the bundled excerpts. Examples: the 56-byte `Order` (divide by 56 via a multiply in `addLimitOrder`), 24-byte levels (stride `0x18`), 8-byte bucket pointers (`lsl #3`), and the indirect callback (`blr`).
 
 ## 7. Reproduction commands
 
@@ -205,8 +205,10 @@ Build the harness into a new ignored directory, from the repository root:
 
 ```bash
 out="benchmark_results/$(date -u +%Y%m%dT%H%M%SZ)-profiling-repro"; mkdir -p "$out"
+mkdir "$out/source"
+tar -xzf docs/evidence/2026-10-09-throughput/measured-source.tar.gz -C "$out/source"
 h=docs/evidence/2026-10-09-profiling/harness/prof_harness.cpp
-common=(-std=c++20 -O3 -DNDEBUG -march=native -flto -Iinclude -Ibenchmarks src/order_pool.cpp src/price_level.cpp "$h")
+common=(-std=c++20 -O3 -DNDEBUG -march=native -flto -I"$out/source/include" -I"$out/source/benchmarks" "$out/source/src/order_pool.cpp" "$out/source/src/price_level.cpp" "$h")
 /usr/bin/clang++ "${common[@]}" -o "$out/prof_timing"
 /usr/bin/clang++ "${common[@]}" -DUSE_RUSAGE -o "$out/prof_rusage"
 /usr/bin/clang++ "${common[@]}" -DCOUNT_ALLOCS -o "$out/prof_alloc"
@@ -224,6 +226,15 @@ GLEVELS_SEED=7 "$out/prof_rusage" levels10 10000 1 3
 ```
 
 The exact commands behind the published data are in [commands.sh](commands.sh). The [bundle README](README.md) expands its shorthand entries.
+
+To rebuild the three harness revisions against the measured engine snapshot, use the source directory prepared above:
+
+```bash
+PROFILING_SOURCE_DIR="$PWD/$out/source" \
+  bash docs/evidence/2026-10-09-profiling/harness/provenance_audit.sh
+```
+
+The audit compares binaries with its local archive when available, and checks revision code and generated-input equivalence. Without `PROFILING_SOURCE_DIR`, it builds against the current checkout; that does not reproduce this bundle's engine version.
 
 **Re-sampling the benchmarks** needs a Release benchmark build, for example one produced by the [throughput reproduction](../../throughput-report.md#reproduction):
 

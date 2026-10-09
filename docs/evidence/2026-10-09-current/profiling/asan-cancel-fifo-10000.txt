@@ -1,0 +1,2 @@
+cancel-fifo/10000 rep=0 batches=72 ops=720000 timed_ns=77400789 ns_per_op=107.5011 Mops=9.302
+cancel-fifo/10000 SUMMARY median_ns_per_op=107.5011 median_Mops=9.302 min=107.5011 max=107.5011

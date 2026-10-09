@@ -1,0 +1,4 @@
+Order bytes: 56
+PriceLevel bytes: 24
+Pointer bytes: 8
+Timer nanoseconds per tick: 125/3 = 41.6667

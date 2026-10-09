@@ -1,6 +1,6 @@
 # Evidence: 2026-10-09 hot-path profiling
 
-This bundle supports the [profiling report](../../profiling-report.md). The profiling was diagnostic: no engine, benchmark or test code was changed, and no optimization was measured.
+This bundle preserves diagnostic profiling measurements for source tree `0bad3d2`, with engine code equivalent to throughput commit `a8edeb4`. No engine, benchmark or test code was changed during that investigation, and no optimization was measured. The [evidence index](../README.md) distinguishes these results from the current-facing reports and identifies the shared harness.
 
 Raw outputs are copied unchanged from the recorded profiling run. Only the following files were produced for publication, from the recorded artifacts:
 - `README.md`
@@ -14,9 +14,9 @@ Raw outputs are copied unchanged from the recorded profiling run. Only the follo
 
 Executables, debug symbols, full disassembly dumps, archive-wide mtime listings and the diagnostic working notes are excluded.
 
-[METHODOLOGY.md](METHODOLOGY.md) gives the measurement methods, validation rules, workload definitions, complete result matrices and reproduction commands that the report summarizes.
+[METHODOLOGY.md](METHODOLOGY.md) gives the measurement methods, validation rules, workload definitions, complete result matrices and reproduction commands for this bundle.
 
-Verify the bundle and every value quoted in the report, without running a benchmark:
+Verify the bundle and its recorded numerical claims, without running a benchmark:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 \
@@ -79,7 +79,7 @@ It uses only the Python standard library.
 - [correctness/dup_id_repro.cpp](correctness/dup_id_repro.cpp): probe for duplicate order IDs.
 - [correctness/output-asan-debug.txt](correctness/output-asan-debug.txt): its sanitizer-enabled output.
 
-See [§8.2 of the report](../../profiling-report.md#82-correctness-finding-duplicate-order-ids).
+The probe and output characterize the measured source version; they do not describe duplicate-ID handling in the current engine.
 
 ## Command trace
 

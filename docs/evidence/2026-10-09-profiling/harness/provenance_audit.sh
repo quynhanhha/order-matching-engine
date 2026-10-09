@@ -4,8 +4,10 @@
 # against each other (function level), and by the inputs each revision generates.
 # Usage (from the repository root): bash docs/evidence/2026-10-09-profiling/harness/provenance_audit.sh [archive-dir]
 # Writes only to a temporary directory. Requires Apple Clang, otool, c++filt, patch, python3.
+# PROFILING_SOURCE_DIR selects an extracted measured engine source tree; default is the checkout.
 set -euo pipefail
 repo="$(pwd)"; here="$repo/docs/evidence/2026-10-09-profiling/harness"
+engine_source="${PROFILING_SOURCE_DIR:-$repo}"
 archive="${1:-$repo/benchmark_results/20261009T060102Z-phase3-profiling}"
 t="$(mktemp -d)"; trap 'rm -rf "$t"' EXIT
 mkdir -p "$t/rev1" "$t/rev2" "$t/rev3"
@@ -16,8 +18,8 @@ echo "Harness source SHA-256: rev1 $(shasum -a 256 "$t/rev1/prof_harness.cpp" | 
 for rev in rev1 rev2 rev3; do
   for v in timing:"" rusage:-DUSE_RUSAGE alloc:-DCOUNT_ALLOCS pcsamp:-DPC_SAMPLE; do
     # Same flags as the recorded harness/build.sh (absolute paths do not affect the output).
-    /usr/bin/clang++ -std=c++20 -O3 -DNDEBUG -march=native -flto -Wall -Wextra -I"$repo/include" -I"$repo/benchmarks" \
-      ${v#*:} "$repo/src/order_pool.cpp" "$repo/src/price_level.cpp" "$t/$rev/prof_harness.cpp" -o "$t/$rev/prof_${v%%:*}"
+    /usr/bin/clang++ -std=c++20 -O3 -DNDEBUG -march=native -flto -Wall -Wextra -I"$engine_source/include" -I"$engine_source/benchmarks" \
+      ${v#*:} "$engine_source/src/order_pool.cpp" "$engine_source/src/price_level.cpp" "$t/$rev/prof_harness.cpp" -o "$t/$rev/prof_${v%%:*}"
     otool -tvV "$t/$rev/prof_${v%%:*}" | tail -n +2 > "$t/${rev}_${v%%:*}.asm"
   done
 done
@@ -84,7 +86,7 @@ int main() {
     $extra
 }
 CPP
-  /usr/bin/clang++ -std=c++20 -O1 -DNDEBUG -w -I"$repo/include" -I"$repo/benchmarks" "$repo/src/order_pool.cpp" "$repo/src/price_level.cpp" "$t/probe_$rev.cpp" -o "$t/probe_$rev"
+  /usr/bin/clang++ -std=c++20 -O1 -DNDEBUG -w -I"$engine_source/include" -I"$engine_source/benchmarks" "$engine_source/src/order_pool.cpp" "$engine_source/src/price_level.cpp" "$t/probe_$rev.cpp" -o "$t/probe_$rev"
   "$t/probe_$rev" > "$t/probe_$rev.out"
 done
 python3 -I - "$t" <<'PY'

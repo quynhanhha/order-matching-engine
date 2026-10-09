@@ -1,0 +1,8 @@
+Methodology: repaired; two sessions, five repetitions each
+Units: million incoming API calls per measured second; no individual-call percentiles
+BM_AddOnly_Resting/100/real_time: median 30.618 M/s; range 29.457-30.916 M/s; sample CV 1.68%; session median difference 0.53%
+BM_AddOnly_Resting/1000/real_time: median 38.696 M/s; range 37.696-38.964 M/s; sample CV 1.00%; session median difference 0.23%
+BM_AddOnly_Resting/10000/real_time: median 40.895 M/s; range 40.209-41.474 M/s; sample CV 0.97%; session median difference 1.13%
+BM_MatchOneToOne/100/real_time: median 26.657 M/s; range 26.339-26.919 M/s; sample CV 0.75%; session median difference 1.05%
+BM_MatchOneToOne/1000/real_time: median 46.829 M/s; range 46.261-47.563 M/s; sample CV 0.95%; session median difference 0.61%
+BM_MatchOneToOne/10000/real_time: median 50.791 M/s; range 44.123-51.369 M/s; sample CV 4.38%; session median difference 0.02%

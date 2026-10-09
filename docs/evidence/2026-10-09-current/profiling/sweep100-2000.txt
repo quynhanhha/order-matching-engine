@@ -1,0 +1,6 @@
+sweep100/2000 rep=0 batches=724 ops=14480 timed_ns=21893438 ns_per_op=1511.9778 Mops=0.661
+sweep100/2000 rep=1 batches=712 ops=14240 timed_ns=22018480 ns_per_op=1546.2416 Mops=0.647
+sweep100/2000 rep=2 batches=732 ops=14640 timed_ns=21860578 ns_per_op=1493.2089 Mops=0.670
+sweep100/2000 rep=3 batches=732 ops=14640 timed_ns=21807864 ns_per_op=1489.6082 Mops=0.671
+sweep100/2000 rep=4 batches=733 ops=14660 timed_ns=21840621 ns_per_op=1489.8104 Mops=0.671
+sweep100/2000 SUMMARY median_ns_per_op=1493.2089 median_Mops=0.670 min=1489.6082 max=1546.2416

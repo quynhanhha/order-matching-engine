@@ -1,0 +1,6 @@
+add-glevels64/10000 rep=0 batches=1568 ops=15680000 timed_ns=321816197 ns_per_op=20.5240 Mops=48.723
+add-glevels64/10000 rep=1 batches=1582 ops=15820000 timed_ns=321018447 ns_per_op=20.2919 Mops=49.281
+add-glevels64/10000 rep=2 batches=1588 ops=15880000 timed_ns=320539594 ns_per_op=20.1851 Mops=49.541
+add-glevels64/10000 rep=3 batches=1594 ops=15940000 timed_ns=320026890 ns_per_op=20.0770 Mops=49.808
+add-glevels64/10000 rep=4 batches=1590 ops=15900000 timed_ns=319890203 ns_per_op=20.1189 Mops=49.705
+add-glevels64/10000 SUMMARY median_ns_per_op=20.1851 median_Mops=49.541 min=20.0770 max=20.5240

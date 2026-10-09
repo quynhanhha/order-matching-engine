@@ -1,0 +1,2 @@
+cancel-fifo/10000 rep=0 batches=334 ops=3340000 (timing not reported in allocation-counting build)
+cancel-fifo/10000 rep=0 alloc_per_op=0.000000 free_per_op=1.000000 bytes_per_op=0.000 max_size=0 sizes:

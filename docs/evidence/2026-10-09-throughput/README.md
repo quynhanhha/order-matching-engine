@@ -1,6 +1,6 @@
 # Evidence: 2026-10-09 batch API throughput
 
-This compact bundle supports the [canonical performance report](../../throughput-report.md). Raw measurement files are copied unchanged from the recorded run. Rates describe synthetic, single-threaded batch API throughput with an empty callback, not individual-order latency or production capacity.
+This bundle preserves throughput measurements for source commit `a8edeb48184757bfab19abc042a66788a5deb5d5`. Raw measurement files are copied unchanged from the recorded run. Rates describe synthetic, single-threaded batch API throughput with an empty callback, not individual-order latency or production capacity. The [evidence index](../README.md) distinguishes these measurements from the results supporting the current-facing reports and identifies shared tooling and files.
 
 ## Results and conditions
 
@@ -37,6 +37,17 @@ PYTHONDONTWRITEBYTECODE=1 python3 \
 bash docs/evidence/2026-10-09-throughput/reproduce.sh --prepare-only
 ```
 
-See the report for the full measurement invocation. Preparation downloads Google Benchmark v1.8.3 and Google Test v1.14.0 if needed; no new dependency is introduced. New runs write to a new `benchmark_results/` directory and do not overwrite this bundle.
+The helper runs the current checkout. To reproduce this bundle, use a separate clean Git checkout of `a8edeb48184757bfab19abc042a66788a5deb5d5` and run its `scripts/run_throughput.sh` with the prepared dependency paths. The runner requires Git metadata to record provenance; an extracted source archive alone is sufficient for compilation but not its complete provenance workflow. For a local full-history clone, after preparing dependencies above:
+
+```bash
+archive_source="benchmark_results/$(date -u +%Y%m%dT%H%M%SZ)-throughput-source"
+git clone --no-hardlinks . "$archive_source"
+git -C "$archive_source" checkout --detach a8edeb48184757bfab19abc042a66788a5deb5d5
+BENCHMARK_SOURCE_DIR="$PWD/.cache/throughput-deps/benchmark" \
+GOOGLETEST_SOURCE_DIR="$PWD/.cache/throughput-deps/googletest" \
+CXX=/usr/bin/clang++ bash "$archive_source/scripts/run_throughput.sh" repaired
+```
+
+Preparation downloads Google Benchmark v1.8.3 and Google Test v1.14.0 if needed; no new dependency is introduced. New runs write to a new `benchmark_results/` directory and do not overwrite this bundle.
 
 The original artifacts remain intact in the local archive. This bundle is deliberately separate from ignored generated results; `.gitignore` excludes only generated and local paths, so evidence files, including JSON, are tracked without exceptions. GitHub links resolve within the repository when these publication files are committed and pushed.

@@ -1,0 +1,6 @@
+iso-umap-erase/10000 rep=0 batches=2082 ops=10410000 timed_ns=139123867 ns_per_op=13.3644 Mops=74.825
+iso-umap-erase/10000 rep=1 batches=2033 ops=10165000 timed_ns=139199632 ns_per_op=13.6940 Mops=73.025
+iso-umap-erase/10000 rep=2 batches=2060 ops=10300000 timed_ns=139642582 ns_per_op=13.5575 Mops=73.760
+iso-umap-erase/10000 rep=3 batches=2066 ops=10330000 timed_ns=139262711 ns_per_op=13.4814 Mops=74.176
+iso-umap-erase/10000 rep=4 batches=2007 ops=10035000 timed_ns=142660052 ns_per_op=14.2162 Mops=70.342
+iso-umap-erase/10000 SUMMARY median_ns_per_op=13.5575 median_Mops=73.760 min=13.3644 max=14.2162
