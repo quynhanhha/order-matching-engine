@@ -1,0 +1,4 @@
+add/100 rep=0 batches=256617 ops=25661700 (timing not reported in allocation-counting build)
+add/100 rep=0 alloc_per_op=1.000000 free_per_op=0.000000 bytes_per_op=32.000 max_size=32 sizes: <=32:25661700
+add/100 rep=1 batches=269412 ops=26941200 (timing not reported in allocation-counting build)
+add/100 rep=1 alloc_per_op=1.000000 free_per_op=0.000000 bytes_per_op=32.000 max_size=32 sizes: <=32:26941200

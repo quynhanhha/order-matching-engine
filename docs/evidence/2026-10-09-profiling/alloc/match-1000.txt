@@ -1,0 +1,4 @@
+match/1000 rep=0 batches=32595 ops=16297500 (timing not reported in allocation-counting build)
+match/1000 rep=0 alloc_per_op=0.000000 free_per_op=1.000000 bytes_per_op=0.000 max_size=0 sizes:
+match/1000 rep=1 batches=32453 ops=16226500 (timing not reported in allocation-counting build)
+match/1000 rep=1 alloc_per_op=0.000000 free_per_op=1.000000 bytes_per_op=0.000 max_size=0 sizes:

@@ -1,0 +1,31 @@
+Engine source identity: measured executable vs profiling harness
+
+The archived benchmark executable was built from a8edeb48184757bfab19abc042a66788a5deb5d5.
+The profiling harness was built from the working tree at 0bad3d2c2bb9e9e1802c96f3cc8a7bc7bec0bd7f (clean).
+Intervening commits: 8274d96 (style: remove redundant comments), 0bad3d2 (documentation).
+
+Git blob IDs (a8edeb4 | 0bad3d2 | path):
+  d7c0af084c7343f1092c75e55302e0037667907f | d7c0af084c7343f1092c75e55302e0037667907f | include/order.h
+  753bcfdd5b352a63f8a5f63abda1453d3cdd9f4a | 753bcfdd5b352a63f8a5f63abda1453d3cdd9f4a | include/order_pool.h
+  b53f34be2ce151ea011dec524de8b09bc4c1445a | b53f34be2ce151ea011dec524de8b09bc4c1445a | include/price_level.h
+  c1bf635f259b2a22649208e6ee19ff876119dd62 | c1bf635f259b2a22649208e6ee19ff876119dd62 | include/types.h
+  81a8c53e6eb2af06580c57efa5d69023665fbb26 | 61f1a944de1077f7a833ba0039a2cf63f1174e18 | include/order_book.h
+  557eb4b8de7928a0702b3ef5786096af3d910744 | 557eb4b8de7928a0702b3ef5786096af3d910744 | src/order_pool.cpp
+  78a61756c2408a91d6bbd0d626a808b5ea675655 | 78a61756c2408a91d6bbd0d626a808b5ea675655 | src/price_level.cpp
+  1f2cac34e00aed1c08f93d2b363f087adf52d3d1 | 82801f7dbbe61038e4ee997a8b481bccea34cfaa | benchmarks/throughput_workloads.h
+
+Method: for each tree, run '/usr/bin/clang++ -std=c++20 -DNDEBUG -E -P -x c++ -I<tree>/include -I<tree>/benchmarks <file>',
+collapse whitespace, and compare. Preprocessing removes comments and expands every engine header used.
+(Without -DNDEBUG the only difference is the __LINE__ value embedded in one assert() in order_book.h.)
+  identical: order_pool.cpp
+  identical: price_level.cpp
+  identical: throughput_workloads.h
+
+Whole-tree check: in CMakeLists.txt, include/, src/, benchmarks/, scripts/ and tests/, removing comments
+(// ... and whole-line # ...) from every changed line of 'git diff a8edeb4 0bad3d2' leaves 0 unmatched
+removed/added lines: the intervening commits changed only comments in those files.
+
+Machine-code check: see disassembly/codegen-identity.txt (addLimitOrder identical in all three builds).
+
+Harness source SHA-256 (as published here):
+  6d2484c14a9950153676f9483263bf2f016373235ddaf8c93ff16aa99899393d  harness/prof_harness.cpp

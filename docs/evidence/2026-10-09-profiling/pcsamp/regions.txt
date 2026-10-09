@@ -1,0 +1,17 @@
+== pcsamp/add-10000.txt (4372 timed samples)
+     872  19.9%  Buy resting: findOrCreateBidLevel lower_bound loop
+     847  19.4%  Sell resting: findOrCreateAskLevel lower_bound loop
+     302   6.9%  prologue + OrderPool::allocate (free-list pop, isAllocated_ store) + Order::init
+     246   5.6%  level hit/insert + PriceLevel::addToTail + index emplace call
+      60   1.4%  epilogue (incl. return from index emplace)
+      38   0.9%  Sell incoming: crossing check + matchSell loop (not exercised by Buy workloads)
+      35   0.8%  Buy incoming: crossing check + matchBuy loop head, SMP check, fill arithmetic, callback dispatch
+== pcsamp/match-10000.txt (2178 timed samples)
+     237  10.9%  prologue + OrderPool::allocate (free-list pop, isAllocated_ store) + Order::init
+     188   8.6%  Buy incoming: crossing check + matchBuy loop head, SMP check, fill arithmetic, callback dispatch
+      92   4.2%  epilogue (incl. return from index emplace)
+      64   2.9%  matchBuy: resting OrderPool::deallocate + level-empty check + loop back-edge
+      41   1.9%  matchBuy/matchSell: asks_/bids_.resize(numLevels) bookkeeping
+      37   1.7%  matchBuy: exhausted check + FIFO unlink (PriceLevel::remove) + index erase call
+      17   0.8%  fully filled incoming: OrderPool::deallocate
+       1   0.0%  Sell resting: findOrCreateAskLevel lower_bound loop

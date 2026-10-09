@@ -1,0 +1,6 @@
+match/1000 rep=0 batches=59823 ops=29911500 timed_ns=554596432 ns_per_op=18.5412 Mops=53.934 instr_per_op=432.270 cycles_per_op=73.985 ipc=5.843 cycles_per_ns=3.990 p_instr_frac=1.0000 p_cycles_frac=1.0000
+match/1000 rep=1 batches=59478 ops=29739000 timed_ns=554594521 ns_per_op=18.6487 Mops=53.623 instr_per_op=432.265 cycles_per_op=74.225 ipc=5.824 cycles_per_ns=3.980 p_instr_frac=0.9961 p_cycles_frac=0.9938
+match/1000 rep=2 batches=59891 ops=29945500 timed_ns=555114114 ns_per_op=18.5375 Mops=53.945 instr_per_op=432.271 cycles_per_op=73.970 ipc=5.844 cycles_per_ns=3.990 p_instr_frac=1.0000 p_cycles_frac=1.0000
+match/1000 rep=3 batches=59644 ops=29822000 timed_ns=559613063 ns_per_op=18.7651 Mops=53.290 instr_per_op=432.267 cycles_per_op=74.827 ipc=5.777 cycles_per_ns=3.988 p_instr_frac=1.0000 p_cycles_frac=1.0000
+match/1000 rep=4 batches=58366 ops=29183000 timed_ns=555108763 ns_per_op=19.0216 Mops=52.572 instr_per_op=432.285 cycles_per_op=74.982 ipc=5.765 cycles_per_ns=3.942 p_instr_frac=0.9841 p_cycles_frac=0.9746
+match/1000 SUMMARY median_ns_per_op=18.6487 median_Mops=53.623 min=18.5375 max=19.0216

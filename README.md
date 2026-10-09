@@ -10,7 +10,7 @@ A C++20 limit order book and matching engine with price–time priority, partial
 - A synchronous, templated callback receives each trade's buy order ID, sell order ID, price, and quantity.
 - Best bid/ask access returns the best price level in constant time.
 
-The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply unique order IDs, positive quantities, and sufficient pool capacity.
+The engine currently implements limit orders for a single book. Market/IOC/FOK order types, network ingestion, persistence, and concurrent book access are outside its implemented scope. Callers supply unique order IDs, positive quantities, and sufficient pool capacity. Duplicate IDs are not detected and are unsupported: they can leave resting orders uncancellable ([correctness finding](docs/profiling-report.md#82-correctness-finding-duplicate-order-ids)).
 
 ## Architecture and memory management
 
@@ -78,7 +78,9 @@ Measured on Apple M3 Pro with 36 GiB memory, macOS 26.5.2, Apple Clang 21, C++20
 
 These are single-threaded, amortized batch API rates with an empty trade callback, measured in two consecutive process runs with five repetitions each. Setup and teardown are excluded; allocation/deallocation inside API calls remains included. The matching workload is a favorable case with no price-level removal, partial fills, or SMP events. These results do not establish production exchange capacity or individual-order latency percentiles.
 
-The [current performance report](docs/throughput-report.md) is the authoritative methodology and results document. The [repository evidence bundle](docs/evidence/2026-10-09-throughput/README.md) contains raw results, source identity, compiler/environment records, and test evidence.
+The [throughput report](docs/throughput-report.md) is the authoritative methodology and results document. The [repository evidence bundle](docs/evidence/2026-10-09-throughput/README.md) contains raw results, source identity, compiler/environment records, and test evidence.
+
+The [hot-path profiling report](docs/profiling-report.md) is a diagnostic investigation of where this time goes, and it adds no new throughput claims. Its main finding is that the order-ID index's per-order node allocation and free is the largest cost in both workloads. It also covers price-level lookup and cancellation behavior, and it has its own [evidence bundle](docs/evidence/2026-10-09-profiling/README.md).
 
 ## Reproduce throughput from a fresh clone
 
@@ -105,6 +107,6 @@ See the [report's reproduction instructions](docs/throughput-report.md#reproduct
 - `tests/`: matching, FIFO/price priority, SMP, cancellation, allocation, pool, and workload checks.
 - `benchmarks/`: Google Benchmark suite, shared throughput inputs/validation, and latency harness.
 - `scripts/`: throughput runner and result accounting/summary checks.
-- `docs/`: current performance report and compact published evidence.
+- `docs/`: throughput and profiling reports with compact published evidence.
 
 [MIT License](LICENSE).

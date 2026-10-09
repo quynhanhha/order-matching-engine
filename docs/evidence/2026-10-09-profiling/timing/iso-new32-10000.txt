@@ -1,0 +1,6 @@
+iso-new32/10000 rep=0 batches=9616 ops=96160000 timed_ns=1015518967 ns_per_op=10.5607 Mops=94.691
+iso-new32/10000 rep=1 batches=9639 ops=96390000 timed_ns=1016773146 ns_per_op=10.5485 Mops=94.800
+iso-new32/10000 rep=2 batches=9528 ops=95280000 timed_ns=1018028300 ns_per_op=10.6846 Mops=93.593
+iso-new32/10000 rep=3 batches=9690 ops=96900000 timed_ns=1016192348 ns_per_op=10.4870 Mops=95.356
+iso-new32/10000 rep=4 batches=9680 ops=96800000 timed_ns=1015979723 ns_per_op=10.4957 Mops=95.277
+iso-new32/10000 SUMMARY median_ns_per_op=10.5485 median_Mops=94.800 min=10.4870 max=10.6846

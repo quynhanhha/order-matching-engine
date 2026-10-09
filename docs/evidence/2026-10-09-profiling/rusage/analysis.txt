@@ -1,0 +1,32 @@
+bracket overhead per window: 6024.6 instructions, 1378.8 cycles
+add-1000                     ns/op(rusage build)=  24.335 vs timing=  23.986 (+1.5%) | instr/op=   422.90 (cv 0.00%) cycles/op=   91.99 (cv 0.37%) IPC=4.60 cycles/ns=3.78 | max window overhead 1.40%
+add-10000                    ns/op(rusage build)=  23.971 vs timing=  23.690 (+1.2%) | instr/op=   417.23 (cv 0.06%) cycles/op=   90.26 (cv 0.31%) IPC=4.62 cycles/ns=3.77 | max window overhead 0.14%
+add-100000                   ns/op(rusage build)=  24.229 vs timing=  23.854 (+1.6%) | instr/op=   416.47 (cv 0.00%) cycles/op=   91.01 (cv 0.35%) IPC=4.58 cycles/ns=3.76 | max window overhead 0.01%
+add-1000000                  ns/op(rusage build)=  24.783 vs timing=  23.827 (+4.0%) | COUNTERS SUPPRESSED {'ns_vs_timing<3%': False} | max window overhead 0.00%
+cancel-fifo-10000            ns/op(rusage build)=  23.026 vs timing=  23.491 (-2.0%) | instr/op=   343.50 (cv 0.01%) cycles/op=   86.54 (cv 0.19%) IPC=3.97 cycles/ns=3.76 | max window overhead 0.18%
+cancel-fifo-100000           ns/op(rusage build)=  23.900 vs timing=  23.406 (+2.1%) | instr/op=   343.63 (cv 0.01%) cycles/op=   87.89 (cv 0.39%) IPC=3.91 cycles/ns=3.68 | max window overhead 0.02%
+cancel-fifo-1000000          ns/op(rusage build)=  23.398 vs timing=  25.268 (-7.4%) | COUNTERS SUPPRESSED {'ns_vs_timing<3%': False} | max window overhead 0.00%
+cancel-shuffled-10000        ns/op(rusage build)=  38.763 vs timing=  38.530 (+0.6%) | instr/op=   359.49 (cv 0.03%) cycles/op=  145.08 (cv 0.45%) IPC=2.48 cycles/ns=3.74 | max window overhead 0.17%
+cancel-shuffled-100000       ns/op(rusage build)=  45.071 vs timing=  44.345 (+1.6%) | instr/op=   359.65 (cv 0.01%) cycles/op=  168.72 (cv 1.28%) IPC=2.13 cycles/ns=3.74 | max window overhead 0.02%
+cancel-shuffled-1000000      ns/op(rusage build)= 186.837 vs timing= 186.219 (+0.3%) | COUNTERS SUPPRESSED {'cv_cyc<2%': False} | max window overhead 0.00%
+control-chain-1000           ns/op(rusage build)=   0.530 vs timing=     nan (+nan%) | COUNTERS SUPPRESSED {'overhead<5%': False} | max window overhead 60.08%
+control-chain-100000         ns/op(rusage build)=   0.502 vs timing=     nan (+nan%) | instr/op=     4.00 (cv 0.00%) cycles/op=    2.01 (cv 0.03%) IPC=1.99 cycles/ns=4.00 | max window overhead 1.48%
+control-chain-10000000       ns/op(rusage build)=   0.500 vs timing=     nan (+nan%) | instr/op=     4.00 (cv 0.00%) cycles/op=    2.00 (cv 0.03%) IPC=2.00 cycles/ns=4.01 | max window overhead 0.02%
+iso-delete32-10000.run2      ns/op(rusage build)=  10.202 vs timing=  10.463 (-2.5%) | instr/op=   203.29 (cv 0.00%) cycles/op=   38.68 (cv 0.25%) IPC=5.26 cycles/ns=3.79 | max window overhead 0.59%
+iso-delete32-10000           ns/op(rusage build)=  10.146 vs timing=  11.105 (-8.6%) | COUNTERS SUPPRESSED {'ns_vs_timing<3%': False} | max window overhead 0.59%
+iso-new32-10000              ns/op(rusage build)=  10.633 vs timing=  10.549 (+0.8%) | instr/op=   232.25 (cv 0.00%) cycles/op=   39.56 (cv 0.15%) IPC=5.87 cycles/ns=3.72 | max window overhead 0.26%
+iso-umap-erase-10000         ns/op(rusage build)=  13.727 vs timing=  13.545 (+1.3%) | instr/op=   278.31 (cv 0.00%) cycles/op=   51.17 (cv 0.44%) IPC=5.44 cycles/ns=3.73 | max window overhead 0.43%
+iso-umap-insert-10000.run2   ns/op(rusage build)=  13.146 vs timing=  13.055 (+0.7%) | instr/op=   297.72 (cv 0.11%) cycles/op=   48.91 (cv 0.58%) IPC=6.09 cycles/ns=3.72 | max window overhead 0.20%
+iso-umap-insert-10000        ns/op(rusage build)=  13.308 vs timing=  12.895 (+3.2%) | COUNTERS SUPPRESSED {'ns_vs_timing<3%': False} | max window overhead 0.20%
+levels1-10000                ns/op(rusage build)=  17.655 vs timing=  17.184 (+2.7%) | instr/op=   393.15 (cv 0.09%) cycles/op=   65.40 (cv 0.41%) IPC=6.01 cycles/ns=3.70 | max window overhead 0.15%
+levels2048-10000             ns/op(rusage build)=  91.076 vs timing=  90.413 (+0.7%) | instr/op=  1274.49 (cv 0.01%) cycles/op=  341.51 (cv 0.25%) IPC=3.73 cycles/ns=3.75 | max window overhead 0.05%
+levels256-10000              ns/op(rusage build)=  24.555 vs timing=  24.591 (-0.1%) | instr/op=   472.61 (cv 0.00%) cycles/op=   92.66 (cv 0.07%) IPC=5.10 cycles/ns=3.77 | max window overhead 0.13%
+levels64-10000               ns/op(rusage build)=  19.882 vs timing=  19.961 (-0.4%) | instr/op=   439.78 (cv 0.00%) cycles/op=   75.00 (cv 0.47%) IPC=5.86 cycles/ns=3.77 | max window overhead 0.14%
+match-1000                   ns/op(rusage build)=  18.649 vs timing=  18.308 (+1.9%) | instr/op=   420.22 (cv 0.00%) cycles/op=   71.47 (cv 0.60%) IPC=5.88 cycles/ns=3.83 | max window overhead 2.79%
+match-10000                  ns/op(rusage build)=  18.533 vs timing=  18.306 (+1.2%) | instr/op=   420.30 (cv 0.00%) cycles/op=   70.03 (cv 0.27%) IPC=6.00 cycles/ns=3.78 | max window overhead 0.29%
+match-100000                 ns/op(rusage build)=  18.995 vs timing=  18.832 (+0.9%) | instr/op=   420.67 (cv 0.02%) cycles/op=   69.78 (cv 0.35%) IPC=6.03 cycles/ns=3.67 | max window overhead 0.03%
+match-1000000                ns/op(rusage build)=  18.709 vs timing=  18.965 (-1.3%) | instr/op=   420.71 (cv 0.01%) cycles/op=   69.45 (cv 0.49%) IPC=6.06 cycles/ns=3.71 | max window overhead 0.00%
+partial-10000                ns/op(rusage build)=   4.890 vs timing=   4.771 (+2.5%) | instr/op=   127.02 (cv 0.00%) cycles/op=   18.66 (cv 0.46%) IPC=6.81 cycles/ns=3.82 | max window overhead 0.94%
+sweep1-2000                  ns/op(rusage build)=  17.835 vs timing=  18.625 (-4.2%) | COUNTERS SUPPRESSED {'ns_vs_timing<3%': False} | max window overhead 0.70%
+sweep10-2000                 ns/op(rusage build)= 162.493 vs timing= 160.617 (+1.2%) | instr/op=  3399.08 (cv 0.01%) cycles/op=  620.84 (cv 0.44%) IPC=5.47 cycles/ns=3.82 | max window overhead 0.88%
+sweep100-2000                ns/op(rusage build)=1539.630 vs timing=1507.382 (+2.1%) | instr/op= 33129.99 (cv 0.01%) cycles/op= 5914.73 (cv 0.41%) IPC=5.60 cycles/ns=3.84 | max window overhead 0.90%

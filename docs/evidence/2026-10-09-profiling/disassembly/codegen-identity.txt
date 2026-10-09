@@ -1,0 +1,6 @@
+Method: extract OrderBook<void(*)(const Trade&)>::addLimitOrder from each otool -tvV dump, drop the address
+column, replace hexadecimal immediates/targets with ADDR, and compare the instruction sequences.
+measured benchmark executable (archived otool dump): 338 instructions, 7 bl/blr call instructions, sha256 cbadd2dfcc6145d45fbbf37512544c609f3ea13ee7f05bb45df2712cafd0832e
+harness prof_timing (first build): 338 instructions, 7 bl/blr call instructions, sha256 cbadd2dfcc6145d45fbbf37512544c609f3ea13ee7f05bb45df2712cafd0832e
+harness prof_pcsamp (final build): 338 instructions, 7 bl/blr call instructions, sha256 cbadd2dfcc6145d45fbbf37512544c609f3ea13ee7f05bb45df2712cafd0832e
+RESULT: IDENTICAL

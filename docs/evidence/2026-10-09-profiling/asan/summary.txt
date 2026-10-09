@@ -1,0 +1,13 @@
+PASS add 1000
+PASS match 1000
+PASS partial 1000
+PASS levels2048 10000
+PASS cancel-fifo 1000
+PASS cancel-shuffled 1000
+PASS sweep1 2000
+PASS sweep10 2000
+PASS sweep100 2000
+PASS add 100000
+PASS cancel-shuffled 100000
+PASS add 1000000
+PASS cancel-shuffled 1000000

@@ -1,0 +1,4 @@
+cancel-shuffled/1000000 rep=0 batches=14 ops=14000000 timed_ns=2704484667 ns_per_op=193.1775 Mops=5.177
+cancel-shuffled/1000000 rep=1 batches=15 ops=15000000 timed_ns=2793281165 ns_per_op=186.2187 Mops=5.370
+cancel-shuffled/1000000 rep=2 batches=15 ops=15000000 timed_ns=2730038542 ns_per_op=182.0026 Mops=5.494
+cancel-shuffled/1000000 SUMMARY median_ns_per_op=186.2187 median_Mops=5.370 min=182.0026 max=193.1775

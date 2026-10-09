@@ -1,0 +1,6 @@
+iso-umap-erase/10000 rep=0 batches=8132 ops=40660000 timed_ns=551793530 ns_per_op=13.5709 Mops=73.687 instr_per_op=279.526 cycles_per_op=51.054 ipc=5.475 cycles_per_ns=3.762 p_instr_frac=0.9956 p_cycles_frac=0.9935
+iso-umap-erase/10000 rep=1 batches=8071 ops=40355000 timed_ns=553943381 ns_per_op=13.7268 Mops=72.850 instr_per_op=279.510 cycles_per_op=51.587 ipc=5.418 cycles_per_ns=3.758 p_instr_frac=0.9945 p_cycles_frac=0.9922
+iso-umap-erase/10000 rep=2 batches=8169 ops=40845000 timed_ns=551564222 ns_per_op=13.5038 Mops=74.053 instr_per_op=279.519 cycles_per_op=51.138 ipc=5.466 cycles_per_ns=3.787 p_instr_frac=0.9997 p_cycles_frac=0.9994
+iso-umap-erase/10000 rep=3 batches=8010 ops=40050000 timed_ns=553284709 ns_per_op=13.8148 Mops=72.386 instr_per_op=279.516 cycles_per_op=51.448 ipc=5.433 cycles_per_ns=3.724 p_instr_frac=0.9862 p_cycles_frac=0.9808
+iso-umap-erase/10000 rep=4 batches=7945 ops=39725000 timed_ns=552504471 ns_per_op=13.9082 Mops=71.900 instr_per_op=279.524 cycles_per_op=51.584 ipc=5.419 cycles_per_ns=3.709 p_instr_frac=0.9879 p_cycles_frac=0.9829
+iso-umap-erase/10000 SUMMARY median_ns_per_op=13.7268 median_Mops=72.850 min=13.5038 max=13.9082

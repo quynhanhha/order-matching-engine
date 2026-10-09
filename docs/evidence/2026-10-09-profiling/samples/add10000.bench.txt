@@ -1,0 +1,15 @@
+Unable to determine clock rate from sysctl: hw.cpufrequency: No such file or directory
+This does not affect benchmark measurements, only the metadata output.
+***WARNING*** Failed to set thread affinity. Estimated CPU frequency may be incorrect.
+2026-10-09T17:01:26+11:00
+Running /Users/quynhanhha/projects/c++/order-matching-engine/benchmark_results/20261009T035923Z-repaired/build-release/order_book_bench
+Run on (12 X 24 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB
+  L1 Instruction 128 KiB
+  L2 Unified 4096 KiB (x12)
+Load Average: 2.37, 4.49, 3.79
+---------------------------------------------------------------------------------------------
+Benchmark                                   Time             CPU   Iterations UserCounters...
+---------------------------------------------------------------------------------------------
+BM_AddOnly_Resting/10000/real_time        241 us          241 us       234112 final_orders=10k incoming_orders_per_batch=10k initial_orders=0 items_per_second=41.4856M/s validated_no_smp=1 validated_trades_per_batch=0 non-crossing additions; no-op callback; elapsed time; allocations included

@@ -1,0 +1,2 @@
+partial/1000 rep=0 batches=1027 ops=513500 timed_ns=16110015 ns_per_op=31.3730 Mops=31.875
+partial/1000 SUMMARY median_ns_per_op=31.3730 median_Mops=31.875 min=31.3730 max=31.3730

@@ -1,0 +1,55 @@
+{
+  "context": {
+    "date": "2026-10-09T17:10:29+11:00",
+    "host_name": "qa-2.local",
+    "executable": "/Users/quynhanhha/projects/c++/order-matching-engine/benchmark_results/20261009T035923Z-repaired/build-release/order_book_bench",
+    "num_cpus": 12,
+    "mhz_per_cpu": 24,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 65536,
+        "num_sharing": 0
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 131072,
+        "num_sharing": 0
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 4194304,
+        "num_sharing": 1
+      }
+    ],
+    "load_avg": [2.94775,3.26416,3.36475],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_MatchOneToOne/1000/real_time",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_MatchOneToOne/1000/real_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5355096,
+      "real_time": 1.0214897004543873e+01,
+      "cpu_time": 1.0197126064600980e+01,
+      "time_unit": "us",
+      "final_orders": 5.0000000000000000e+02,
+      "incoming_orders_per_batch": 5.0000000000000000e+02,
+      "initial_orders": 1.0000000000000000e+03,
+      "items_per_second": 4.8948119572579727e+07,
+      "validated_no_smp": 1.0000000000000000e+00,
+      "validated_trades_per_batch": 5.0000000000000000e+02,
+      "label": "1:1 full fills; no-op callback; elapsed time; deallocations included"
+    }
+  ]
+}

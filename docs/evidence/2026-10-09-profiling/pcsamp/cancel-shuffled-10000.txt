@@ -1,0 +1,154 @@
+# samples in timed region: 3352; ticks outside timed region: 2147
+## by symbol
+    2457  73.30% prof_pcsamp _ZN14CancelWorkload5batchER5Accum
+     462  13.78% libsystem_malloc.dylib _xzm_free
+     177   5.28% prof_pcsamp _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE
+     108   3.22% libsystem_malloc.dylib _free
+      80   2.39% libsystem_platform.dylib _platform_memset
+      13   0.39% libc++abi.dylib ?
+      11   0.33% libsystem_malloc.dylib free
+      11   0.33% libsystem_kernel.dylib mach_vm_reclaim_update_kernel_accounting_trap
+      11   0.33% libsystem_malloc.dylib ?
+       7   0.21% libsystem_kernel.dylib mach_absolute_time
+       7   0.21% prof_pcsamp ?
+       5   0.15% libsystem_platform.dylib __bzero
+       2   0.06% libsystem_malloc.dylib _xzm_chunk_batch_list_push
+       1   0.03% libc++abi.dylib _ZdlPv
+## by symbol+offset
+     373  11.13% _ZN14CancelWorkload5batchER5Accum+0x1c0
+     311   9.28% _ZN14CancelWorkload5batchER5Accum+0x204
+     247   7.37% _ZN14CancelWorkload5batchER5Accum+0x240
+     212   6.32% _ZN14CancelWorkload5batchER5Accum+0x1fc
+     199   5.94% _ZN14CancelWorkload5batchER5Accum+0x1b4
+     164   4.89% _ZN14CancelWorkload5batchER5Accum+0x244
+     150   4.47% _ZN14CancelWorkload5batchER5Accum+0x200
+     110   3.28% _ZN14CancelWorkload5batchER5Accum+0x130
+      79   2.36% _ZN14CancelWorkload5batchER5Accum+0x138
+      79   2.36% _xzm_free+0x3e4
+      68   2.03% _ZN14CancelWorkload5batchER5Accum+0x158
+      62   1.85% _platform_memset+0xb4
+      50   1.49% _ZN14CancelWorkload5batchER5Accum+0xe4
+      42   1.25% _ZN14CancelWorkload5batchER5Accum+0x1dc
+      39   1.16% _ZN14CancelWorkload5batchER5Accum+0xd4
+      38   1.13% _xzm_free+0x2a0
+      37   1.10% _xzm_free+0x2ac
+      37   1.10% _ZN14CancelWorkload5batchER5Accum+0x220
+      35   1.04% _ZN14CancelWorkload5batchER5Accum+0x250
+      33   0.98% _xzm_free+0x3dc
+      32   0.95% _ZN14CancelWorkload5batchER5Accum+0x210
+      31   0.92% _ZN14CancelWorkload5batchER5Accum+0x1b8
+      31   0.92% ?+0x0
+      31   0.92% _ZN14CancelWorkload5batchER5Accum+0x128
+      28   0.84% _ZN14CancelWorkload5batchER5Accum+0x144
+      27   0.81% _xzm_free+0x104
+      27   0.81% _xzm_free+0x618
+      25   0.75% _ZN14CancelWorkload5batchER5Accum+0x1cc
+      25   0.75% _free+0x24
+      24   0.72% _ZN14CancelWorkload5batchER5Accum+0x248
+      23   0.69% _xzm_free+0x140
+      22   0.66% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x44
+      20   0.60% _free+0x40
+      19   0.57% _ZN14CancelWorkload5batchER5Accum+0x270
+      18   0.54% _xzm_free+0xe8
+      17   0.51% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x38
+      17   0.51% _xzm_free+0x108
+      16   0.48% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x108
+      16   0.48% _platform_memset+0xd0
+      15   0.45% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x50
+      15   0.45% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x4
+      15   0.45% _xzm_free+0x2b4
+      14   0.42% _ZN14CancelWorkload5batchER5Accum+0x280
+      14   0.42% _ZN14CancelWorkload5batchER5Accum+0x108
+      14   0.42% _ZN14CancelWorkload5batchER5Accum+0xe8
+      14   0.42% _free+0x0
+      13   0.39% _ZN14CancelWorkload5batchER5Accum+0x26c
+      13   0.39% _ZN14CancelWorkload5batchER5Accum+0x278
+      12   0.36% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xd8
+      12   0.36% _ZN14CancelWorkload5batchER5Accum+0xf8
+      12   0.36% _xzm_free+0x4d8
+      11   0.33% mach_vm_reclaim_update_kernel_accounting_trap+0x8
+      11   0.33% _ZN14CancelWorkload5batchER5Accum+0x1f8
+      11   0.33% free+0x0
+      10   0.30% _free+0x14
+      10   0.30% _ZN14CancelWorkload5batchER5Accum+0xc0
+      10   0.30% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x98
+      10   0.30% _xzm_free+0xac
+      10   0.30% _xzm_free+0x1c
+      10   0.30% _xzm_free+0x234
+      10   0.30% _free+0x4c
+       9   0.27% _xzm_free+0xc4
+       9   0.27% _ZN14CancelWorkload5batchER5Accum+0x23c
+       9   0.27% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xbc
+       8   0.24% _xzm_free+0x28
+       8   0.24% _xzm_free+0x3b8
+       7   0.21% _free+0x2c
+       7   0.21% _ZN14CancelWorkload5batchER5Accum+0x1f4
+       7   0.21% _free+0xc
+       6   0.18% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x14
+       6   0.18% _xzm_free+0xdc
+       6   0.18% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xec
+       6   0.18% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x30
+       6   0.18% _xzm_free+0x244
+       6   0.18% _xzm_free+0x10
+       6   0.18% _free+0x60
+       6   0.18% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xe8
+       6   0.18% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x5c
+       6   0.18% _xzm_free+0x130
+       6   0.18% _xzm_free+0x160
+       5   0.15% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x8c
+       5   0.15% _xzm_free+0x610
+       5   0.15% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xa8
+       5   0.15% _free+0x38
+       5   0.15% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xc4
+       5   0.15% _xzm_free+0x78
+       5   0.15% __bzero+0x0
+       4   0.12% _ZN14CancelWorkload5batchER5Accum+0x30c
+       4   0.12% _xzm_free+0x80
+       4   0.12% _xzm_free+0x88
+       4   0.12% mach_absolute_time+0x6c
+       4   0.12% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xc8
+       4   0.12% _ZN14CancelWorkload5batchER5Accum+0x260
+       4   0.12% _ZN14CancelWorkload5batchER5Accum+0x2f0
+       4   0.12% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x6c
+       3   0.09% _ZN14CancelWorkload5batchER5Accum+0x238
+       3   0.09% _xzm_free+0x290
+       3   0.09% _xzm_free+0x3e0
+       3   0.09% _ZN14CancelWorkload5batchER5Accum+0x258
+       3   0.09% _xzm_free+0x27c
+       3   0.09% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xf8
+       3   0.09% mach_absolute_time+0x10
+       3   0.09% _ZN14CancelWorkload5batchER5Accum+0x308
+       3   0.09% _xzm_free+0x308
+       3   0.09% _xzm_free+0x12c
+       3   0.09% _xzm_free+0x10c
+       3   0.09% _ZN14CancelWorkload5batchER5Accum+0x268
+       2   0.06% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xb4
+       2   0.06% _xzm_free+0x534
+       2   0.06% _xzm_free+0xa4
+       2   0.06% _xzm_free+0xc
+       2   0.06% _xzm_free+0x4d0
+       2   0.06% _free+0x1c
+       2   0.06% _ZN14CancelWorkload5batchER5Accum+0x1ec
+       2   0.06% _free+0x68
+       2   0.06% _ZN14CancelWorkload5batchER5Accum+0x228
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0xa4
+       1   0.03% _xzm_free+0xd4
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0x230
+       1   0.03% _xzm_free+0x40
+       1   0.03% _xzm_free+0x614
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0x300
+       1   0.03% _xzm_chunk_batch_list_push+0xc
+       1   0.03% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xf0
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0x27c
+       1   0.03% _xzm_free+0x60c
+       1   0.03% _platform_memset+0xb0
+       1   0.03% _platform_memset+0xbc
+       1   0.03% _xzm_free+0x3d8
+       1   0.03% _xzm_free+0xf4
+       1   0.03% _ZdlPv+0x0
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0xcc
+       1   0.03% _ZN14CancelWorkload5batchER5Accum+0x1bc
+       1   0.03% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0xe4
+       1   0.03% _xzm_chunk_batch_list_push+0xb0
+       1   0.03% _ZNSt3__112__hash_tableINS_17__hash_value_typeIyP5OrderEENS_22__unordered_map_hasherIyNS_4pairIKyS3_EENS_4hashIyEENS_8equal_toIyEELb1EEENS_21__unordered_map_equalIyS8_SC_SA_Lb1EEENS_9allocatorIS8_EEE6removeENS_21__hash_const_iteratorIPNS_11__hash_nodeIS4_PvEEEE+0x104
+       1   0.03% _xzm_free+0x14c

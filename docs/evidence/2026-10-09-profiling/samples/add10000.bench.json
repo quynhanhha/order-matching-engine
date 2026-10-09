@@ -1,0 +1,55 @@
+{
+  "context": {
+    "date": "2026-10-09T17:01:26+11:00",
+    "host_name": "qa-2.local",
+    "executable": "/Users/quynhanhha/projects/c++/order-matching-engine/benchmark_results/20261009T035923Z-repaired/build-release/order_book_bench",
+    "num_cpus": 12,
+    "mhz_per_cpu": 24,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 65536,
+        "num_sharing": 0
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 131072,
+        "num_sharing": 0
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 4194304,
+        "num_sharing": 1
+      }
+    ],
+    "load_avg": [2.36523,4.49121,3.79297],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_AddOnly_Resting/10000/real_time",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_AddOnly_Resting/10000/real_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 234112,
+      "real_time": 2.4104762024763247e+02,
+      "cpu_time": 2.4084991798796861e+02,
+      "time_unit": "us",
+      "final_orders": 1.0000000000000000e+04,
+      "incoming_orders_per_batch": 1.0000000000000000e+04,
+      "initial_orders": 0.0000000000000000e+00,
+      "items_per_second": 4.1485578616071068e+07,
+      "validated_no_smp": 1.0000000000000000e+00,
+      "validated_trades_per_batch": 0.0000000000000000e+00,
+      "label": "non-crossing additions; no-op callback; elapsed time; allocations included"
+    }
+  ]
+}

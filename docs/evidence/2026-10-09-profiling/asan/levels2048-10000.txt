@@ -1,0 +1,2 @@
+add-glevels2048/10000 rep=0 batches=59 ops=590000 timed_ns=158369920 ns_per_op=268.4236 Mops=3.725
+add-glevels2048/10000 SUMMARY median_ns_per_op=268.4236 median_Mops=3.725 min=268.4236 max=268.4236

@@ -1,0 +1,14 @@
+--- rev2/prof_harness.cpp
++++ rev3/prof_harness.cpp
+@@ -222,8 +222,9 @@
+             in = throughput_workloads::generateRestingOrders(n, rng);
+             nm = "add/" + std::to_string(n);
+         } else {
+-            // K distinct prices per side, non-crossing, deterministic.
+-            std::mt19937_64 rng(42);
++            // K distinct prices per side, non-crossing, deterministic (optional GLEVELS_SEED override).
++            const char* seedEnv = std::getenv("GLEVELS_SEED");
++            std::mt19937_64 rng(seedEnv ? std::strtoull(seedEnv, nullptr, 10) : 42);
+             std::uniform_int_distribution<uint32_t> pd(0, spreadLevels - 1), qd(1, 100);
+             std::uniform_int_distribution<uint64_t> partd(1, 100);
+             const uint32_t bidBase = 10000, askBase = bidBase + spreadLevels + 10;

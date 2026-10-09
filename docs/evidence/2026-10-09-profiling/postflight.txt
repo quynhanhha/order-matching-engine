@@ -1,0 +1,10 @@
+== git
+0bad3d2c2bb9e9e1802c96f3cc8a7bc7bec0bd7f
+(end porcelain)
+== binary
+ce8ce5ee5a094b7be31889a2b927909e56619a55be096269e55994d540cb17b6  benchmark_results/20261009T035923Z-repaired/build-release/order_book_bench
+Verified artifact hashes, 21 source files against the measured-code commit,
+all 60 raw repetitions and outcome/rate accounting, summary statistics,
+dependency identities, recorded test results, and evidence Git visibility.
+verify exit=0
+archive mtimes/sizes: UNCHANGED (1024 files)

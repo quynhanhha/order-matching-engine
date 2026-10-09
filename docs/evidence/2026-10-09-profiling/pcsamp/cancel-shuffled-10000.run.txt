@@ -1,0 +1,6 @@
+cancel-shuffled/10000 rep=0 batches=6306 ops=63060000 timed_ns=2425743785 ns_per_op=38.4672 Mops=25.996
+cancel-shuffled/10000 rep=1 batches=6298 ops=62980000 timed_ns=2424616469 ns_per_op=38.4982 Mops=25.975
+cancel-shuffled/10000 rep=2 batches=6297 ops=62970000 timed_ns=2426320458 ns_per_op=38.5314 Mops=25.953
+cancel-shuffled/10000 rep=3 batches=6220 ops=62200000 timed_ns=2419515756 ns_per_op=38.8990 Mops=25.708
+cancel-shuffled/10000 rep=4 batches=6072 ops=60720000 timed_ns=2430816751 ns_per_op=40.0332 Mops=24.979
+cancel-shuffled/10000 SUMMARY median_ns_per_op=38.5314 median_Mops=25.953 min=38.4672 max=40.0332

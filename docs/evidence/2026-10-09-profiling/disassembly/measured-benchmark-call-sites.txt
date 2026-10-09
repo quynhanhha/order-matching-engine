@@ -1,0 +1,10 @@
+# Return-address offsets seen in `sample` call graphs, mapped to the call instruction at offset-4
+# in the measured executable. TIMED = the addLimitOrder call inside the ResumeTiming/PauseTiming interval.
+__ZL18BM_AddOnly_RestingRN9benchmark5StateE +2464: bl	__ZN9OrderBookIPFvRK5TradeEEC2EmS4_                                 untimed: OrderBook constructor
+__ZL18BM_AddOnly_RestingRN9benchmark5StateE +2508: bl	__ZN9OrderBookIPFvRK5TradeEE13addLimitOrderE4Sidejjyy               TIMED: addLimitOrder (batch inputs)
+__ZL18BM_AddOnly_RestingRN9benchmark5StateE +2544: bl	0x10002cdb4                                                         untimed: teardown (index node frees)
+__ZL16BM_MatchOneToOneRN9benchmark5StateE +2348: bl	__ZN9OrderBookIPFvRK5TradeEEC2EmS4_                                 untimed: OrderBook constructor
+__ZL16BM_MatchOneToOneRN9benchmark5StateE +2380: bl	__ZN9OrderBookIPFvRK5TradeEE13addLimitOrderE4Sidejjyy               untimed: prepopulation addLimitOrder
+__ZL16BM_MatchOneToOneRN9benchmark5StateE +2436: bl	__ZN9OrderBookIPFvRK5TradeEE13addLimitOrderE4Sidejjyy               TIMED: addLimitOrder (incoming orders)
+__ZL16BM_MatchOneToOneRN9benchmark5StateE +2456: bl	__ZN9benchmark5State11PauseTimingEv                                 framework: PauseTiming
+__ZL16BM_MatchOneToOneRN9benchmark5StateE +2604: bl	0x10002cdb4                                                         untimed: teardown

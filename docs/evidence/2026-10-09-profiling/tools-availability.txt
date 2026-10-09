@@ -1,0 +1,39 @@
+Profiling tool availability on the recorded machine (Apple M3 Pro, macOS 26.5.2).
+Re-queried for publication on 2026-10-09T07:07:26Z; the same checks were made, but not saved, before profiling.
+
+$ xcode-select -p
+/Library/Developer/CommandLineTools
+
+$ xcrun -f xctrace
+xcrun: error: unable to find utility "xctrace", not a developer tool or in PATH
+
+$ xcrun -f instruments
+xcrun: error: unable to find utility "instruments", not a developer tool or in PATH
+
+$ xcrun -f llvm-mca
+xcrun: error: unable to find utility "llvm-mca", not a developer tool or in PATH
+
+$ xcrun -f llvm-objdump
+/Library/Developer/CommandLineTools/usr/bin/llvm-objdump
+
+$ command -v sample otool heap malloc_history vmmap leaks
+/usr/bin/sample
+/usr/bin/otool
+/usr/bin/heap
+/usr/bin/malloc_history
+/usr/bin/vmmap
+/usr/bin/leaks
+
+$ command -v perf valgrind
+
+$ csrutil status
+System Integrity Protection status: enabled.
+
+$ dtrace -l -n profile-997
+dtrace: system integrity protection is on, some features will not be available
+dtrace: failed to initialize dtrace: DTrace requires additional privileges
+
+$ sysctl hw.cachelinesize hw.perflevel0.l1dcachesize hw.perflevel0.l2cachesize
+hw.cachelinesize: 128
+hw.perflevel0.l1dcachesize: 131072
+hw.perflevel0.l2cachesize: 16777216

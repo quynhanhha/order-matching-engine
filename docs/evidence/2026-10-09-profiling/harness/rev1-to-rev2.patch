@@ -1,0 +1,31 @@
+--- rev1/prof_harness.cpp
++++ rev2/prof_harness.cpp
+@@ -216,8 +216,8 @@
+ struct AddWorkload : Workload {
+     std::vector<OrderInput> in;
+     std::string nm;
+-    explicit AddWorkload(std::size_t n, uint32_t spreadLevels = 10) {
+-        if (spreadLevels == 10) {
++    explicit AddWorkload(std::size_t n, uint32_t spreadLevels = 10, bool generic = false) {
++        if (spreadLevels == 10 && !generic) {
+             std::mt19937_64 rng(42);
+             in = throughput_workloads::generateRestingOrders(n, rng);
+             nm = "add/" + std::to_string(n);
+@@ -231,7 +231,7 @@
+                 const bool buy = (i % 2 == 0);
+                 in.push_back({buy ? Side::Buy : Side::Sell, (buy ? bidBase : askBase) + pd(rng), qd(rng), i + 1, partd(rng)});
+             }
+-            nm = "add-levels" + std::to_string(spreadLevels) + "/" + std::to_string(n);
++            nm = "add-glevels" + std::to_string(spreadLevels) + "/" + std::to_string(n);
+         }
+         auto v = throughput_workloads::validateRestingOrders(in);
+         if (!v.error.empty()) die(nm + ": " + v.error);
+@@ -429,7 +429,7 @@
+     if (w == "add") return new AddWorkload(n);
+     if (w == "match") return new MatchWorkload(n);
+     if (w == "partial") return new PartialWorkload(n);
+-    if (w.rfind("levels", 0) == 0) return new AddWorkload(n, static_cast<uint32_t>(std::stoul(w.substr(6))));
++    if (w.rfind("levels", 0) == 0) return new AddWorkload(n, static_cast<uint32_t>(std::stoul(w.substr(6))), true);
+     if (w == "cancel-fifo") return new CancelWorkload(n, false);
+     if (w == "cancel-shuffled") return new CancelWorkload(n, true);
+     if (w.rfind("cancel-shuffled-levels", 0) == 0) return new CancelWorkload(n, true, static_cast<uint32_t>(std::stoul(w.substr(22))));

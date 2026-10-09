@@ -1,0 +1,293 @@
+Analysis of sampling order_book_bench (pid 91736) every 1 millisecond
+Process:         order_book_bench [91736]
+Path:            /Users/USER/*/order_book_bench
+Load Address:    0x104388000
+Identifier:      order_book_bench
+Version:         0
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  bash [91735]
+Target Type:     live task
+
+Date/Time:       2026-10-09 17:01:29.979 +1100
+Launch Time:     2026-10-09 17:01:25.912 +1100
+OS Version:      macOS 26.5.2 (25F84)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         2576K
+Physical footprint (peak):  3696K
+Idle exit:                  untracked
+----
+
+Call graph:
+    21286 Thread_128493962   DispatchQueue_1: com.apple.main-thread  (serial)
+      21286 start  (in dyld) + 6992  [0x1802bfe00]
+        21286 main  (in order_book_bench) + 2280  [0x1043933d8]
+          21286 benchmark::RunSpecifiedBenchmarks(benchmark::BenchmarkReporter*, benchmark::BenchmarkReporter*, std::basic_string<char>)  (in order_book_bench) + 8964  [0x104397288]
+            21286 benchmark::internal::BenchmarkRunner::DoNIterations()  (in order_book_bench) + 712  [0x1043a74c4]
+              21286 benchmark::internal::(anonymous namespace)::RunInThread(benchmark::internal::BenchmarkInstance const*, long long, int, benchmark::internal::ThreadManager*, benchmark::internal::PerfCountersMeasurement*)  (in order_book_bench) + 200  [0x1043a7974]
+                14041 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2508  [0x10438981c]
+                + 7539 OrderBook<void (*)(Trade const&)>::addLimitOrder(Side, unsigned int, unsigned int, unsigned long long, unsigned long long)  (in order_book_bench) + 1320  [0x10438f2c0]
+                + ! 6138 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__emplace_unique_key_args<unsigned long long, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>, std::tuple<Order*&>>(unsigned long long const&, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>&&, std::tuple<Order*&>&&)  (in order_book_bench) + 236  [0x10438fa10]
+                + ! : 5359 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + ! : | 2550 _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib) + 88,420,...  [0x18049ff2c,0x1804a0078,...]
+                + ! : | 1281 <deduplicated_symbol>  (in libsystem_malloc.dylib) + 112,212,...  [0x18049a144,0x18049a1a8,...]
+                + ! : | 970 _xzm_xzone_malloc  (in libsystem_malloc.dylib) + 8,180,...  [0x18049a8c8,0x18049a974,...]
+                + ! : | 480 malloc_type_malloc  (in libsystem_malloc.dylib) + 28,72,...  [0x18048e000,0x18048e02c,...]
+                + ! : | 40 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 324  [0x1804a177c]
+                + ! : | + 17 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 860  [0x1804a2270]
+                + ! : | + ! 16 xzm_chunk_mark_used  (in libsystem_malloc.dylib) + 188  [0x180482ecc]
+                + ! : | + ! : 14 _xzm_reclaim_mark_used  (in libsystem_malloc.dylib) + 124  [0x180482f7c]
+                + ! : | + ! : | 14 _xzm_reclaim_mark_used_locked  (in libsystem_malloc.dylib) + 60  [0x180485a50]
+                + ! : | + ! : |   12 mach_vm_reclaim_try_cancel  (in libsystem_kernel.dylib) + 260  [0x18064d2c8]
+                + ! : | + ! : |   + 12 mach_absolute_time  (in libsystem_kernel.dylib) + 108,16,...  [0x18063a10c,0x18063a0b0,...]
+                + ! : | + ! : |   2 mach_vm_reclaim_try_cancel  (in libsystem_kernel.dylib) + 0,256  [0x18064d1c4,0x18064d2c4]
+                + ! : | + ! : 1 _xzm_reclaim_mark_used  (in libsystem_malloc.dylib) + 176  [0x180482fb0]
+                + ! : | + ! : | 1 mach_vm_reclaim_update_kernel_accounting  (in libsystem_kernel.dylib) + 92  [0x18064d464]
+                + ! : | + ! : |   1 mach_vm_reclaim_update_kernel_accounting_trap  (in libsystem_kernel.dylib) + 8  [0x180639cb8]
+                + ! : | + ! : 1 _xzm_reclaim_mark_used  (in libsystem_malloc.dylib) + 76  [0x180482f4c]
+                + ! : | + ! 1 xzm_chunk_mark_used  (in libsystem_malloc.dylib) + 208  [0x180482ee0]
+                + ! : | + !   1 mach_vm_reclaim_is_reusable  (in libsystem_kernel.dylib) + 0  [0x18064d4a8]
+                + ! : | + 10 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 168  [0x1804a1fbc]
+                + ! : | + ! 10 _xzm_chunk_list_pop  (in libsystem_malloc.dylib) + 160,44,...  [0x1804a2920,0x1804a28ac,...]
+                + ! : | + 5 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 116,292,...  [0x1804a1f88,0x1804a2038,...]
+                + ! : | + 3 _xzm_chunk_list_pop  (in libsystem_malloc.dylib) + 224  [0x1804a2960]
+                + ! : | + 2 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 336  [0x1804a2064]
+                + ! : | + ! 2 _xzm_xzone_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 220,228  [0x1804a1bf4,0x1804a1bfc]
+                + ! : | + 2 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 584  [0x1804a215c]
+                + ! : | + ! 2 _xzm_chunk_list_pop  (in libsystem_malloc.dylib) + 76,116  [0x1804a28cc,0x1804a28f4]
+                + ! : | + 1 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 788  [0x1804a2228]
+                + ! : | +   1 _xzm_chunk_list_pop  (in libsystem_malloc.dylib) + 76  [0x1804a28cc]
+                + ! : | 30 DYLD-STUB$$malloc_type_malloc  (in libc++abi.dylib) + 8  [0x180634c18]
+                + ! : | 6 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 352,248,...  [0x1804a1798,0x1804a1730,...]
+                + ! : | 2 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 248  [0x1804a1730]
+                + ! : |   2 _xzm_xzone_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 104,200  [0x1804a1b80,0x1804a1be0]
+                + ! : 495 operator new(unsigned long)  (in libc++abi.dylib) + 36,52,...  [0x1806347d8,0x1806347e8,...]
+                + ! : 284 DYLD-STUB$$operator new(unsigned long)  (in order_book_bench) + 4,0  [0x1043b4dd0,0x1043b4dcc]
+                + ! 1233 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__emplace_unique_key_args<unsigned long long, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>, std::tuple<Order*&>>(unsigned long long const&, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>&&, std::tuple<Order*&>&&)  (in order_book_bench) + 40,544,...  [0x10438f94c,0x10438fb44,...]
+                + ! 168 operator new(unsigned long)  (in libc++abi.dylib) + 76  [0x180634800]
+                + 6169 OrderBook<void (*)(Trade const&)>::addLimitOrder(Side, unsigned int, unsigned int, unsigned long long, unsigned long long)  (in order_book_bench) + 1200,1076,...  [0x10438f248,0x10438f1cc,...]
+                + 328 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__emplace_unique_key_args<unsigned long long, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>, std::tuple<Order*&>>(unsigned long long const&, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>&&, std::tuple<Order*&>&&)  (in order_book_bench) + 592,580  [0x10438fb74,0x10438fb68]
+                + 5 OrderBook<void (*)(Trade const&)>::addLimitOrder(Side, unsigned int, unsigned int, unsigned long long, unsigned long long)  (in order_book_bench) + 1244  [0x10438f274]
+                +   3 std::vector<PriceLevel>::insert(std::__wrap_iter<PriceLevel const*>, PriceLevel&&)  (in order_book_bench) + 344  [0x10438f85c]
+                +   : 3 _platform_memmove  (in libsystem_platform.dylib) + 464,624  [0x180687530,0x1806875d0]
+                +   2 std::vector<PriceLevel>::insert(std::__wrap_iter<PriceLevel const*>, PriceLevel&&)  (in order_book_bench) + 52,488  [0x10438f738,0x10438f8ec]
+                5842 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2544  [0x104389840]
+                + 2916 _xzm_free  (in libsystem_malloc.dylib) + 996,684,...  [0x18049b450,0x18049b318,...]
+                + 1307 _xzm_free  (in libsystem_malloc.dylib) + 352  [0x18049b1cc]
+                + ! 1138 _platform_memset  (in libsystem_platform.dylib) + 180,208,...  [0x180687144,0x180687160,...]
+                + ! 169 DYLD-STUB$$_platform_bzero  (in libsystem_malloc.dylib) + 8  [0x1804b27f4]
+                + 971 _free  (in libsystem_malloc.dylib) + 0,44,...  [0x1804aac4c,0x1804aac78,...]
+                + 316 DYLD-STUB$$free  (in libc++abi.dylib) + 8  [0x180634bd8]
+                + 309 DYLD-STUB$$operator delete(void*)  (in order_book_bench) + 4  [0x1043b4db8]
+                + 15 _xzm_xzone_madvise_batch  (in libsystem_malloc.dylib) + 456  [0x1804a3030]
+                + ! 14 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+                + ! : 11 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+                + ! : | 11 mach_absolute_time  (in libsystem_kernel.dylib) + 108,112  [0x18063a10c,0x18063a110]
+                + ! : 3 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 40,76,...  [0x18064d04c,0x18064d070,...]
+                + ! 1 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 68  [0x18048291c]
+                + 2 _xzm_chunk_list_push  (in libsystem_malloc.dylib) + 156  [0x1804a2878]
+                + 2 _xzm_chunk_list_slot_push  (in libsystem_malloc.dylib) + 128  [0x1804a3990]
+                + ! 2 _xzm_chunk_list_push  (in libsystem_malloc.dylib) + 8,96  [0x1804a27e4,0x1804a283c]
+                + 2 operator delete(void*)  (in libc++abi.dylib) + 0  [0x18061f4b4]
+                + 1 _xzm_chunk_batch_list_push  (in libsystem_malloc.dylib) + 44  [0x1804a2b68]
+                + 1 _xzm_chunk_list_slot_push  (in libsystem_malloc.dylib) + 32  [0x1804a3930]
+                595 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2464  [0x1043897f0]
+                + 540 OrderBook<void (*)(Trade const&)>::OrderBook(unsigned long, void (*)(Trade const&))  (in order_book_bench) + 36  [0x10438ea40]
+                + ! 407 OrderPool::OrderPool(unsigned long)  (in order_book_bench) + 204,200,...  [0x104393578,0x104393574,...]
+                + ! 118 OrderPool::OrderPool(unsigned long)  (in order_book_bench) + 72  [0x1043934f4]
+                + ! : 118 __bzero  (in libsystem_platform.dylib) + 68,72,...  [0x180687074,0x180687078,...]
+                + ! 10 OrderPool::OrderPool(unsigned long)  (in order_book_bench) + 128  [0x10439352c]
+                + ! : 10 _platform_memset  (in libsystem_platform.dylib) + 140  [0x18068711c]
+                + ! 3 OrderPool::OrderPool(unsigned long)  (in order_book_bench) + 60  [0x1043934e8]
+                + ! : 2 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + ! : | 2 _xzm_malloc_large_huge  (in libsystem_malloc.dylib) + 456  [0x18049a3c8]
+                + ! : |   2 xzm_segment_group_alloc_chunk  (in libsystem_malloc.dylib) + 504  [0x1804835c4]
+                + ! : |     2 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 528  [0x180483c00]
+                + ! : |       2 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 364  [0x180485194]
+                + ! : |         2 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+                + ! : |           2 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+                + ! : |             2 mach_absolute_time  (in libsystem_kernel.dylib) + 108  [0x18063a10c]
+                + ! : 1 operator new[](unsigned long)  (in libc++abi.dylib) + 0  [0x18063480c]
+                + ! 2 OrderPool::OrderPool(unsigned long)  (in order_book_bench) + 108  [0x104393518]
+                + !   2 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + !     2 <deduplicated_symbol>  (in libsystem_malloc.dylib) + 112  [0x18049a144]
+                + 43 OrderBook<void (*)(Trade const&)>::OrderBook(unsigned long, void (*)(Trade const&))  (in order_book_bench) + 280  [0x10438eb34]
+                + ! 33 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__do_rehash<true>(unsigned long)  (in order_book_bench) + 88  [0x10438fc38]
+                + ! : 33 __bzero  (in libsystem_platform.dylib) + 68  [0x180687074]
+                + ! 10 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__do_rehash<true>(unsigned long)  (in order_book_bench) + 48  [0x10438fc10]
+                + !   10 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + !     9 _xzm_malloc_large_huge  (in libsystem_malloc.dylib) + 456  [0x18049a3c8]
+                + !     | 9 xzm_segment_group_alloc_chunk  (in libsystem_malloc.dylib) + 504  [0x1804835c4]
+                + !     |   9 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 528  [0x180483c00]
+                + !     |     5 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 240  [0x180485118]
+                + !     |     + 5 _xzm_reclaim_mark_used_locked  (in libsystem_malloc.dylib) + 60  [0x180485a50]
+                + !     |     +   5 mach_vm_reclaim_try_cancel  (in libsystem_kernel.dylib) + 260  [0x18064d2c8]
+                + !     |     +     5 mach_absolute_time  (in libsystem_kernel.dylib) + 108  [0x18063a10c]
+                + !     |     3 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 364  [0x180485194]
+                + !     |     + 3 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+                + !     |     +   3 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+                + !     |     +     3 mach_absolute_time  (in libsystem_kernel.dylib) + 108  [0x18063a10c]
+                + !     |     1 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 432  [0x1804851d8]
+                + !     |       1 mach_vm_reclaim_update_kernel_accounting  (in libsystem_kernel.dylib) + 92  [0x18064d464]
+                + !     |         1 mach_vm_reclaim_update_kernel_accounting_trap  (in libsystem_kernel.dylib) + 8  [0x180639cb8]
+                + !     1 _xzm_malloc_large_huge  (in libsystem_malloc.dylib) + 356  [0x18049a364]
+                + 5 OrderBook<void (*)(Trade const&)>::OrderBook(unsigned long, void (*)(Trade const&))  (in order_book_bench) + 328  [0x10438eb64]
+                + ! 5 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + !   5 _xzm_malloc_large_huge  (in libsystem_malloc.dylib) + 456  [0x18049a3c8]
+                + !     5 xzm_segment_group_alloc_chunk  (in libsystem_malloc.dylib) + 504  [0x1804835c4]
+                + !       4 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 528  [0x180483c00]
+                + !       : 3 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 240  [0x180485118]
+                + !       : | 3 _xzm_reclaim_mark_used_locked  (in libsystem_malloc.dylib) + 60  [0x180485a50]
+                + !       : |   3 mach_vm_reclaim_try_cancel  (in libsystem_kernel.dylib) + 260  [0x18064d2c8]
+                + !       : |     3 mach_absolute_time  (in libsystem_kernel.dylib) + 108  [0x18063a10c]
+                + !       : 1 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 244  [0x18048511c]
+                + !       :   1 DYLD-STUB$$mach_vm_reclaim_is_reusable  (in libsystem_malloc.dylib) + 0  [0x1804b2bbc]
+                + !       1 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 544  [0x180483c10]
+                + 4 OrderBook<void (*)(Trade const&)>::OrderBook(unsigned long, void (*)(Trade const&))  (in order_book_bench) + 412  [0x10438ebb8]
+                + ! 4 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+                + !   4 _xzm_malloc_large_huge  (in libsystem_malloc.dylib) + 456  [0x18049a3c8]
+                + !     3 xzm_segment_group_alloc_chunk  (in libsystem_malloc.dylib) + 504  [0x1804835c4]
+                + !     : 2 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 528  [0x180483c00]
+                + !     : | 1 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 364  [0x180485194]
+                + !     : | + 1 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+                + !     : | +   1 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+                + !     : | +     1 mach_absolute_time  (in libsystem_kernel.dylib) + 112  [0x18063a110]
+                + !     : | 1 _xzm_segment_group_span_mark_smaller  (in libsystem_malloc.dylib) + 48  [0x180485058]
+                + !     : 1 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 788  [0x180483d04]
+                + !     :   1 _xzm_segment_group_segment_span_free  (in libsystem_malloc.dylib) + 12  [0x180486390]
+                + !     1 _xzm_segment_group_find_and_allocate_chunk  (in libsystem_malloc.dylib) + 580  [0x180483c34]
+                + 3 OrderBook<void (*)(Trade const&)>::OrderBook(unsigned long, void (*)(Trade const&))  (in order_book_bench) + 140  [0x10438eaa8]
+                +   3 std::__next_prime(unsigned long)  (in libc++.1.dylib) + 244,216  [0x180590978,0x18059095c]
+                359 _xzm_free  (in libsystem_malloc.dylib) + 1560,1556,...  [0x18049b684,0x18049b680,...]
+                311 OrderBook<void (*)(Trade const&)>::addLimitOrder(Side, unsigned int, unsigned int, unsigned long long, unsigned long long)  (in order_book_bench) + 1340,1324  [0x10438f2d4,0x10438f2c4]
+                33 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2528  [0x104389830]
+                + 32 benchmark::State::PauseTiming()  (in order_book_bench) + 244  [0x1043941a4]
+                + ! 30 thread_info  (in libsystem_kernel.dylib) + 192  [0x180641668]
+                + ! : 30 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x18064c574]
+                + ! :   30 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x180639c34]
+                + ! 1 thread_info  (in libsystem_kernel.dylib) + 496  [0x180641798]
+                + ! : 1 _platform_memmove  (in libsystem_platform.dylib) + 428  [0x18068750c]
+                + ! 1 thread_info  (in libsystem_kernel.dylib) + 0  [0x1806415a8]
+                + 1 benchmark::State::PauseTiming()  (in order_book_bench) + 352  [0x104394210]
+                32 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2476  [0x1043897fc]
+                + 32 benchmark::State::ResumeTiming()  (in order_book_bench) + 204  [0x1043946b4]
+                +   32 thread_info  (in libsystem_kernel.dylib) + 192  [0x180641668]
+                +     32 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x18064c574]
+                +       32 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x180639c34]
+                29 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2452  [0x1043897e4]
+                + 28 benchmark::State::PauseTiming()  (in order_book_bench) + 244  [0x1043941a4]
+                + ! 28 thread_info  (in libsystem_kernel.dylib) + 192  [0x180641668]
+                + !   27 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x18064c574]
+                + !   : 27 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x180639c34]
+                + !   1 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x18064c574]
+                + 1 thread_info  (in libsystem_kernel.dylib) + 384  [0x180641728]
+                25 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2640  [0x1043898a0]
+                + 24 benchmark::State::ResumeTiming()  (in order_book_bench) + 204  [0x1043946b4]
+                + ! 24 thread_info  (in libsystem_kernel.dylib) + 192  [0x180641668]
+                + !   24 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x18064c574]
+                + !     24 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x180639c34]
+                + 1 benchmark::State::ResumeTiming()  (in order_book_bench) + 52  [0x10439461c]
+                +   1 std::chrono::steady_clock::now()  (in libc++.1.dylib) + 28  [0x1805926f0]
+                +     1 clock_gettime  (in libsystem_c.dylib) + 60  [0x18051ad60]
+                +       1 clock_gettime_nsec_np  (in libsystem_c.dylib) + 400  [0x18050d16c]
+                +         1 mach_continuous_time  (in libsystem_kernel.dylib) + 96  [0x18063a084]
+                9 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2492,2536,...  [0x10438980c,0x104389838,...]
+                7 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2568  [0x104389858]
+                + 2 xzm_segment_group_free_chunk  (in libsystem_malloc.dylib) + 860  [0x18048446c]
+                + ! 2 _xzm_segment_group_span_mark_free  (in libsystem_malloc.dylib) + 136  [0x180484bcc]
+                + !   2 _xzm_reclaim_mark_free  (in libsystem_malloc.dylib) + 112  [0x180482dc0]
+                + !     2 xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+                + !       2 mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+                + !         2 mach_absolute_time  (in libsystem_kernel.dylib) + 16,108  [0x18063a0b0,0x18063a10c]
+                + 1 _xzm_free  (in libsystem_malloc.dylib) + 164  [0x18049b110]
+                + 1 _xzm_free_large_huge  (in libsystem_malloc.dylib) + 104  [0x1804a497c]
+                + 1 _xzm_free_outlined  (in libsystem_malloc.dylib) + 756  [0x1804a3708]
+                + 1 xzm_segment_group_free_chunk  (in libsystem_malloc.dylib) + 636  [0x18048438c]
+                + ! 1 _xzm_segment_group_segment_span_free_coalesce  (in libsystem_malloc.dylib) + 356  [0x180484a00]
+                + 1 xzm_segment_group_free_chunk  (in libsystem_malloc.dylib) + 368  [0x180484280]
+                1 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2072  [0x104389668]
+                + 1 std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__emplace_unique_key_args<unsigned long long, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>, std::tuple<Order*&>>(unsigned long long const&, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>&&, std::tuple<Order*&>&&)  (in order_book_bench) + 60  [0x10438f960]
+                1 BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench) + 2600  [0x104389878]
+                + 1 DYLD-STUB$$operator delete(void*)  (in order_book_bench) + 4  [0x1043b4db8]
+                1 _xzm_chunk_list_slot_push  (in libsystem_malloc.dylib) + 260  [0x1804a3a14]
+
+Total number in stack (recursive counted multiple, when >=5):
+        8       mach_absolute_time  (in libsystem_kernel.dylib) + 0  [0x18063a0a0]
+        6       operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x1806347e8]
+        5       mach_vm_reclaim_try_enter  (in libsystem_kernel.dylib) + 296  [0x18064d14c]
+        5       xzm_reclaim_mark_free_locked  (in libsystem_malloc.dylib) + 116  [0x18048294c]
+
+Sort by top of stack, same collapsed (when >= 5):
+        OrderBook<void (*)(Trade const&)>::addLimitOrder(Side, unsigned int, unsigned int, unsigned long long, unsigned long long)  (in order_book_bench)        6480
+        _xzm_free  (in libsystem_malloc.dylib)        3276
+        _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib)        2550
+        std::__hash_table<std::__hash_value_type<unsigned long long, Order*>>::__emplace_unique_key_args<unsigned long long, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>, std::tuple<Order*&>>(unsigned long long const&, std::piecewise_construct_t const&, std::tuple<unsigned long long const&>&&, std::tuple<Order*&>&&)  (in order_book_bench)        1562
+        <deduplicated_symbol>  (in libsystem_malloc.dylib)        1283
+        _platform_memset  (in libsystem_platform.dylib)        1148
+        _free  (in libsystem_malloc.dylib)        971
+        _xzm_xzone_malloc  (in libsystem_malloc.dylib)        970
+        operator new(unsigned long)  (in libc++abi.dylib)        663
+        malloc_type_malloc  (in libsystem_malloc.dylib)        480
+        OrderPool::OrderPool(unsigned long)  (in order_book_bench)        407
+        DYLD-STUB$$free  (in libc++abi.dylib)        316
+        DYLD-STUB$$operator delete(void*)  (in order_book_bench)        310
+        DYLD-STUB$$operator new(unsigned long)  (in order_book_bench)        284
+        DYLD-STUB$$_platform_bzero  (in libsystem_malloc.dylib)        169
+        __bzero  (in libsystem_platform.dylib)        151
+        mach_msg2_trap  (in libsystem_kernel.dylib)        113
+        mach_absolute_time  (in libsystem_kernel.dylib)        39
+        DYLD-STUB$$malloc_type_malloc  (in libc++abi.dylib)        30
+        _xzm_chunk_list_pop  (in libsystem_malloc.dylib)        16
+        BM_AddOnly_Resting(benchmark::State&)  (in order_book_bench)        9
+        _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib)        6
+        _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib)        5
+
+Binary Images:
+       0x104388000 -        0x1043b958b +order_book_bench (0) <032B5B4C-03D2-3DEA-87B3-CE72BB616191> /Users/*/order_book_bench
+       0x180218000 -        0x18026ab4b  libobjc.A.dylib (951.7) <FF1D8AE4-ABEF-35F1-A30A-1183B9CB414F> /usr/lib/libobjc.A.dylib
+       0x18026b000 -        0x18029fd07  libdyld.dylib (1378) <B147D877-D0C2-388F-B38D-D3132E39905F> /usr/lib/system/libdyld.dylib
+       0x1802a0000 -        0x180346217  dyld (1.0.0 - 1378) <F924BDD3-4365-3466-9580-8B1B3FA8F857> /usr/lib/dyld
+       0x180347000 -        0x18034a228  libsystem_blocks.dylib (96) <CC947089-488D-316B-A9C7-46DEC0F73145> /usr/lib/system/libsystem_blocks.dylib
+       0x18034b000 -        0x18039f55f  libxpc.dylib (3102.120.13) <C40FCAE8-7A17-3D82-87CB-3DA4802ADEF1> /usr/lib/system/libxpc.dylib
+       0x1803a0000 -        0x1803c09ff  libsystem_trace.dylib (1861.120.4) <D0FABAB3-5AE7-3F10-8C62-60CBF5D70850> /usr/lib/system/libsystem_trace.dylib
+       0x1803c1000 -        0x18046f5f7  libcorecrypto.dylib (1922.121.1) <A01A158D-6FE7-3B1C-A2C4-6BCB90D7314A> /usr/lib/system/libcorecrypto.dylib
+       0x180470000 -        0x1804c01d7  libsystem_malloc.dylib (812.100.31) <5FAE4807-4D2B-3A95-A63A-DD96D3DA11B4> /usr/lib/system/libsystem_malloc.dylib
+       0x1804c1000 -        0x18050823f  libdispatch.dylib (1542.100.32) <F071EFE4-299F-3089-ACC4-0025B8FFB52A> /usr/lib/system/libdispatch.dylib
+       0x180509000 -        0x18050bffb  libsystem_featureflags.dylib (103) <71FCFFBD-85F8-3365-AFE0-BECEA4369122> /usr/lib/system/libsystem_featureflags.dylib
+       0x18050c000 -        0x18058cd9f  libsystem_c.dylib (1752.120.2) <694B7881-1BF3-3D0F-8F19-B50AE4E8EF8A> /usr/lib/system/libsystem_c.dylib
+       0x18058d000 -        0x18061dae7  libc++.1.dylib (2100.43) <5013C0F8-84A9-3B56-9FEB-C353816A750F> /usr/lib/libc++.1.dylib
+       0x18061e000 -        0x18063875f  libc++abi.dylib (2100.43) <E482D257-E5A0-3816-BD97-7B39342958DA> /usr/lib/libc++abi.dylib
+       0x180639000 -        0x1806762af  libsystem_kernel.dylib (12377.121.10) <FCA53B98-3D6A-38B2-A0EC-DF0F7E05F171> /usr/lib/system/libsystem_kernel.dylib
+       0x180677000 -        0x180683b3b  libsystem_pthread.dylib (539.100.4) <4F33683C-18C8-39A1-800B-2E3BD43BCC13> /usr/lib/system/libsystem_pthread.dylib
+       0x180684000 -        0x18068c963  libsystem_platform.dylib (375.120.2) <160FD864-8D15-36FC-9E97-9725388CFAFE> /usr/lib/system/libsystem_platform.dylib
+       0x18068d000 -        0x1806bc6eb  libsystem_info.dylib (600) <3D62F2D9-F516-31BF-83C7-E203D872300B> /usr/lib/system/libsystem_info.dylib
+       0x184654000 -        0x18465de5f  libsystem_darwin.dylib (1752.120.2) <8858F025-745A-388E-9544-080781CC9A69> /usr/lib/system/libsystem_darwin.dylib
+       0x184abf000 -        0x184ad11b6  libsystem_notify.dylib (348.120.4) <64D76451-1E0C-369B-A631-54DA3140E083> /usr/lib/system/libsystem_notify.dylib
+       0x186d8c000 -        0x186da6f7b  libsystem_networkextension.dylib (2226.121.1) <0331EE20-A1FB-3C0D-990A-F65939CFF505> /usr/lib/system/libsystem_networkextension.dylib
+       0x186e29000 -        0x186e40fdf  libsystem_asl.dylib (406) <F40838DF-2F15-3F62-970F-DEE25706BF1B> /usr/lib/system/libsystem_asl.dylib
+       0x1889e7000 -        0x1889ef387  libsystem_symptoms.dylib (2169.120.7) <F5029F5C-1BF3-31C7-892E-BC8606AC829E> /usr/lib/system/libsystem_symptoms.dylib
+       0x18cc8b000 -        0x18ccc3257  libsystem_containermanager.dylib (725.120.2) <518BE44D-AA31-31E6-B44B-A37AD5E47040> /usr/lib/system/libsystem_containermanager.dylib
+       0x18e09c000 -        0x18e0a05d7  libsystem_configuration.dylib (1405.120.5) <0F7BBC1C-3D50-3E59-A31F-E4672A80BCEB> /usr/lib/system/libsystem_configuration.dylib
+       0x18e0a1000 -        0x18e0a78cf  libsystem_sandbox.dylib (2680.120.12) <EC3A75EA-44C0-3A0B-9BF7-71C117B0A9C6> /usr/lib/system/libsystem_sandbox.dylib
+       0x18f6fb000 -        0x18f6fe1fb  libquarantine.dylib (196.120.2) <5849009B-ACA3-3796-94C4-BBDF8D300EBA> /usr/lib/system/libquarantine.dylib
+       0x18fe9a000 -        0x18fea0d03  libsystem_coreservices.dylib (191.4.5) <9576143B-C303-35A3-BA63-1FD06EDA2BB1> /usr/lib/system/libsystem_coreservices.dylib
+       0x190425000 -        0x190462a77  libsystem_m.dylib (3312.100.1) <A7E0863C-101A-31A0-922B-ED9B02626151> /usr/lib/system/libsystem_m.dylib
+       0x190464000 -        0x190467527  libmacho.dylib (1378) <755441B4-C034-3E3A-8E3C-F424FBB28261> /usr/lib/system/libmacho.dylib
+       0x190481000 -        0x19048e3a7  libcommonCrypto.dylib (600035) <CE357BB1-2D49-37CC-9FFE-D093936B1475> /usr/lib/system/libcommonCrypto.dylib
+       0x19048f000 -        0x190498ca3  libunwind.dylib (2100.2) <FC8F0C4E-6FB0-3E27-ABEF-B0FA720CD5E4> /usr/lib/system/libunwind.dylib
+       0x1904a1000 -        0x1904ab7ff  libcopyfile.dylib (240) <8ACFAC7A-88E9-3EF4-853F-A9140FF110E5> /usr/lib/system/libcopyfile.dylib
+       0x1904ac000 -        0x1904af987  libcompiler_rt.dylib (103.3) <AA79151F-C19D-3C7C-92F8-B10F04D82C1C> /usr/lib/system/libcompiler_rt.dylib
+       0x1904b0000 -        0x1904b478b  libsystem_collections.dylib (1752.120.2) <72DB5BE7-EF78-37D0-8AAD-53E37CFE4287> /usr/lib/system/libsystem_collections.dylib
+       0x1904b5000 -        0x1904b84cf  libsystem_secinit.dylib (168.100.7) <E525C566-CDA4-3D99-B12B-1615FD54A1F3> /usr/lib/system/libsystem_secinit.dylib
+       0x1904b9000 -        0x1904bbbf7  libremovefile.dylib (85.100.6) <635E661D-80A7-340D-A165-3F7D318FDFC9> /usr/lib/system/libremovefile.dylib
+       0x1904bc000 -        0x1904bcf27  libkeymgr.dylib (31) <8C08891A-DF1C-3DCC-AB64-4742FD6BE9BA> /usr/lib/system/libkeymgr.dylib
+       0x1904bd000 -        0x1904c5e37  libsystem_dnssd.dylib (2881.120.11) <6F45DF3F-233B-3BC3-BA8C-B43E7DA884BF> /usr/lib/system/libsystem_dnssd.dylib
+       0x1904c6000 -        0x1904cb09b  libcache.dylib (95) <189B576E-6176-3F82-8FA4-5914B0BEAEE7> /usr/lib/system/libcache.dylib
+       0x1904cc000 -        0x1904cdce3  libSystem.B.dylib (1356) <BA6A669A-3BB9-3BC7-85E8-8F0C1E68351E> /usr/lib/libSystem.B.dylib
+       0x283788000 -        0x28378f349  libRosetta.dylib (367.9) <8651ED4F-6506-3788-B56B-32EE414A85CA> /usr/lib/libRosetta.dylib
+       0x2853a5000 -        0x2853a8a4b  libsystem_darwindirectory.dylib (122) <CF277A2C-C818-3F16-8B3F-3C7B39FCD164> /usr/lib/system/libsystem_darwindirectory.dylib
+       0x2853a9000 -        0x2853b25d3  libsystem_eligibility.dylib (319.121.1) <DDAC0531-0262-3DDC-8EC8-80EB9438847A> /usr/lib/system/libsystem_eligibility.dylib
+       0x2853b3000 -        0x2853ba88b  libsystem_sanitizers.dylib (26.1) <44C4234F-8B2D-38D3-A774-B4B3C75AF3A7> /usr/lib/system/libsystem_sanitizers.dylib
+       0x2853bb000 -        0x2853bbbb7  libsystem_trial.dylib (474.2.18.2) <68C583BA-AFF5-3916-86AE-6E38BFEF98D6> /usr/lib/system/libsystem_trial.dylib

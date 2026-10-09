@@ -1,0 +1,2 @@
+add/100000 rep=0 batches=10 ops=1000000 timed_ns=130420084 ns_per_op=130.4201 Mops=7.668
+add/100000 SUMMARY median_ns_per_op=130.4201 median_Mops=7.668 min=130.4201 max=130.4201

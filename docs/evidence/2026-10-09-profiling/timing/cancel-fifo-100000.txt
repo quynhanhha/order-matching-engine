@@ -1,0 +1,4 @@
+cancel-fifo/100000 rep=0 batches=623 ops=62300000 timed_ns=1458215415 ns_per_op=23.4063 Mops=42.723
+cancel-fifo/100000 rep=1 batches=624 ops=62400000 timed_ns=1446583535 ns_per_op=23.1824 Mops=43.136
+cancel-fifo/100000 rep=2 batches=616 ops=61600000 timed_ns=1446302250 ns_per_op=23.4789 Mops=42.591
+cancel-fifo/100000 SUMMARY median_ns_per_op=23.4063 median_Mops=42.723 min=23.1824 max=23.4789

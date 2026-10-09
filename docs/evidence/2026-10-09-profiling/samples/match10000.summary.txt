@@ -1,0 +1,95 @@
+# match10000.sample.txt
+# total samples under BM_MatchOneToOne call sites: 20504
+
+## prepopulate(untimed): 10200 samples (49.7% of BM_MatchOneToOne samples)
+     6669   65.4%  malloc (operator new path)
+     1954   19.2%  addLimitOrder self (inlined engine code)
+     1577   15.5%  unordered_map code (excl. malloc/free)
+        0    0.0%  (site self)
+
+## TIMED: 5866 samples (28.6% of BM_MatchOneToOne samples)
+     2542   43.3%  free (operator delete path)
+     1400   23.9%  addLimitOrder self (inlined engine code)
+     1194   20.4%  unordered_map code (excl. malloc/free)
+      634   10.8%  free: memset/bzero inside free
+       96    1.6%  trade callback
+        0    0.0%  (site self)
+
+## teardown(untimed): 3264 samples (15.9% of BM_MatchOneToOne samples)
+     2532   77.6%  free (operator delete path)
+      715   21.9%  free: memset/bzero inside free
+        7    0.2%  other: mach_absolute_time   + 108,112  [0x18063a10c,0x18063a110]
+        3    0.1%  other: _xzm_chunk_list_push   + 44,96  [0x1804a2808,0x1804a283c]
+        2    0.1%  other: mach_absolute_time   + 108  [0x18063a10c]
+        1    0.0%  other: _xzm_chunk_batch_list_push   + 44  [0x1804a2b68]
+        1    0.0%  other: _xzm_chunk_list_slot_push   + 32  [0x1804a3930]
+        1    0.0%  other: _xzm_chunk_batch_list_push   + 120  [0x1804a2bb4]
+        1    0.0%  other: _xzm_chunk_list_push   + 44  [0x1804a2808]
+        1    0.0%  malloc (operator new path)
+        0    0.0%  (site self)
+
+## ctor(untimed): 1017 samples (5.0% of BM_MatchOneToOne samples)
+      527   51.8%  other: OrderPool::OrderPool(unsigned long)   + 204  [0x102827578]
+      210   20.6%  other: __bzero   + 68,72,...  [0x180687074,0x180687078,...]
+      120   11.8%  other: OrderPool::OrderPool(unsigned long)   + 204,180,...  [0x1028
+       71    7.0%  other: __bzero   + 68,72  [0x180687074,0x180687078]
+       49    4.8%  unordered_map code (excl. malloc/free)
+       27    2.7%  malloc (operator new path)
+        9    0.9%  other: _platform_memset   + 140  [0x18068711c]
+        4    0.4%  other: std::__next_prime(unsigned long)   + 232,244  [0x18059096c,0
+        0    0.0%  (site self)
+
+## PauseTiming: 44 samples (0.2% of BM_MatchOneToOne samples)
+       39   88.6%  other: mach_msg2_trap   + 8  [0x180639c34]
+        4    9.1%  other: mach_continuous_time   + 96  [0x18063a084]
+        1    2.3%  other: thread_info   + 260  [0x1806416ac]
+        0    0.0%  (site self)
+
+## offset 2336: 42 samples (0.2% of BM_MatchOneToOne samples)
+       40   95.2%  other: mach_msg2_trap   + 8  [0x180639c34]
+        1    2.4%  other: _platform_memmove   + 460  [0x18068752c]
+        1    2.4%  other: benchmark::State::PauseTiming()   + 320  [0x1028281f0]
+        0    0.0%  (site self)
+
+## offset 2404: 34 samples (0.2% of BM_MatchOneToOne samples)
+       30   88.2%  other: mach_msg2_trap   + 8  [0x180639c34]
+        1    2.9%  other: mach_continuous_time   + 100  [0x18063a088]
+        1    2.9%  other: clock_gettime   + 12  [0x18051ad30]
+        1    2.9%  other: benchmark::State::ResumeTiming()   + 292  [0x10282870c]
+        1    2.9%  other: mach_continuous_time   + 96  [0x18063a084]
+        0    0.0%  (site self)
+
+## offset 2704: 24 samples (0.1% of BM_MatchOneToOne samples)
+       23   95.8%  other: mach_msg2_trap   + 8  [0x180639c34]
+        1    4.2%  other: _platform_memmove   + 460  [0x18068752c]
+        0    0.0%  (site self)
+
+## offset 2660: 4 samples (0.0% of BM_MatchOneToOne samples)
+        1   25.0%  other: mach_absolute_time   + 108  [0x18063a10c]
+        1   25.0%  other: _xzm_reclaim_mark_free   + 128  [0x180482dd0]
+        1   25.0%  other: mach_vm_reclaim_try_cancel   + 240  [0x18064d2b4]
+        1   25.0%  other: mach_absolute_time   + 112  [0x18063a110]
+        0    0.0%  (site self)
+
+## offset 2644: 3 samples (0.0% of BM_MatchOneToOne samples)
+        2   66.7%  other: mach_absolute_time   + 108  [0x18063a10c]
+        1   33.3%  other: xzm_segment_group_free_chunk   + 540  [0x18048432c]
+        0    0.0%  (site self)
+
+## offset 2628: 3 samples (0.0% of BM_MatchOneToOne samples)
+        1   33.3%  free (operator delete path)
+        1   33.3%  other: mach_absolute_time   + 108  [0x18063a10c]
+        1   33.3%  other: xzm_segment_group_free_chunk   + 872  [0x180484478]
+        0    0.0%  (site self)
+
+## offset 1160: 1 samples (0.0% of BM_MatchOneToOne samples)
+        1  100.0%  other: std::__bitset_partition[abi:nqe210106]<std::_ClassicAlgPolic
+        0    0.0%  (site self)
+
+## offset 2676: 1 samples (0.0% of BM_MatchOneToOne samples)
+        1  100.0%  other: mach_absolute_time   + 108  [0x18063a10c]
+        0    0.0%  (site self)
+
+## offset 2692: 1 samples (0.0% of BM_MatchOneToOne samples)
+        1  100.0%  other: mach_absolute_time   + 108  [0x18063a10c]
+        0    0.0%  (site self)

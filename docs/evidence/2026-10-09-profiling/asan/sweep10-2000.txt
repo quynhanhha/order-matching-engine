@@ -1,0 +1,2 @@
+sweep10/2000 rep=0 batches=132 ops=26400 timed_ns=23715629 ns_per_op=898.3193 Mops=1.113
+sweep10/2000 SUMMARY median_ns_per_op=898.3193 median_Mops=1.113 min=898.3193 max=898.3193
