@@ -119,6 +119,10 @@ if(BUILD_TESTS)
             order_matching_engine
             GTest::gtest_main
     )
+
+    # Untimed validation of the published throughput workloads
+    add_executable(throughput_workload_test tests/throughput_workload_test.cpp)
+    target_link_libraries(throughput_workload_test PRIVATE order_matching_engine GTest::gtest_main)
     
     include(GoogleTest)
     gtest_discover_tests(order_pool_test)
@@ -127,6 +131,7 @@ if(BUILD_TESTS)
     gtest_discover_tests(order_book_smp_test)
     gtest_discover_tests(order_book_cancel_test)
     gtest_discover_tests(allocation_test)
+    gtest_discover_tests(throughput_workload_test)
     
     # TODO: uncomment when implemented
     # add_executable(order_book_test tests/order_book_test.cpp)
