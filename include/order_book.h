@@ -127,6 +127,7 @@ private:
 
             if (pl->head == nullptr) {  // inlined isEmpty()
                 --numLevels;
+                if (numLevels == 0) { break; }  // No preceding level to advance to.
                 --pl;
             }
         }
@@ -170,6 +171,7 @@ private:
 
             if (pl->head == nullptr) {  // inlined isEmpty()
                 --numLevels;
+                if (numLevels == 0) { break; }  // No preceding level to advance to.
                 --pl;
             }
         }
